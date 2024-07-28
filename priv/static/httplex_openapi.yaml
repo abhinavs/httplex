@@ -1,0 +1,447 @@
+openapi: 3.0.1
+info:
+  title: HTTPlex APIs - test and debug HTTP requests
+  description: HTTPlex is an Elixir-based web service that provides a simple HTTP request and response service. It is inspired from httpbin and helps developers test and debug HTTP requests.
+  version: 1.0.0
+servers:
+  - url: http://httplex.org
+paths:
+  /hello:
+    get:
+      summary: Welcome Message
+      description: Returns a JSON welcome message.
+      responses:
+        "200":
+          description: A JSON welcome message.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /ip:
+    get:
+      summary: IP Address
+      description: Returns the client's IP address.
+      responses:
+        "200":
+          description: Client's IP address.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  origin:
+                    type: string
+  /user-agent:
+    get:
+      summary: User Agent
+      description: Returns the client's User-Agent header.
+      responses:
+        "200":
+          description: Client's User-Agent header.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user-agent:
+                    type: string
+  /headers:
+    get:
+      summary: Headers
+      description: Returns all headers sent in the request.
+      responses:
+        "200":
+          description: Request headers.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /get:
+    get:
+      summary: Request Information
+      description: Returns detailed information about the GET request.
+      responses:
+        "200":
+          description: Request information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  args:
+                    type: object
+                  headers:
+                    type: object
+                  origin:
+                    type: string
+                  url:
+                    type: string
+  /post:
+    post:
+      summary: Request Information
+      description: Returns detailed information about the POST request.
+      responses:
+        "200":
+          description: Request information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  args:
+                    type: object
+                  data:
+                    type: string
+                  files:
+                    type: object
+                  form:
+                    type: object
+                  headers:
+                    type: object
+                  json:
+                    type: object
+                  origin:
+                    type: string
+                  url:
+                    type: string
+  /put:
+    put:
+      summary: Request Information
+      description: Returns detailed information about the PUT request.
+      responses:
+        "200":
+          description: Request information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  args:
+                    type: object
+                  data:
+                    type: string
+                  files:
+                    type: object
+                  form:
+                    type: object
+                  headers:
+                    type: object
+                  json:
+                    type: object
+                  origin:
+                    type: string
+                  url:
+                    type: string
+  /patch:
+    patch:
+      summary: Request Information
+      description: Returns detailed information about the PATCH request.
+      responses:
+        "200":
+          description: Request information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  args:
+                    type: object
+                  data:
+                    type: string
+                  files:
+                    type: object
+                  form:
+                    type: object
+                  headers:
+                    type: object
+                  json:
+                    type: object
+                  origin:
+                    type: string
+                  url:
+                    type: string
+  /delete:
+    delete:
+      summary: Request Information
+      description: Returns detailed information about the DELETE request.
+      responses:
+        "200":
+          description: Request information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  args:
+                    type: object
+                  data:
+                    type: string
+                  files:
+                    type: object
+                  form:
+                    type: object
+                  headers:
+                    type: object
+                  json:
+                    type: object
+                  origin:
+                    type: string
+                  url:
+                    type: string
+  /status/{code}:
+    get:
+      summary: Custom Status Code
+      description: Responds with the specified HTTP status code.
+      parameters:
+        - in: path
+          name: code
+          schema:
+            type: integer
+          required: true
+          description: HTTP status code to respond with.
+      responses:
+        "default":
+          description: Custom status code response.
+  /delay/{n}:
+    get:
+      summary: Delayed Response
+      description: Delays the response by the specified number of seconds.
+      parameters:
+        - in: path
+          name: n
+          schema:
+            type: integer
+          required: true
+          description: Number of seconds to delay the response.
+      responses:
+        "200":
+          description: Delayed response.
+  /base64/{value}:
+    get:
+      summary: Base64 Decoding
+      description: Decodes a Base64 URL-encoded string.
+      parameters:
+        - in: path
+          name: value
+          schema:
+            type: string
+          required: true
+          description: Base64 URL-encoded string to decode.
+      responses:
+        "200":
+          description: Decoded string.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  decoded:
+                    type: string
+  /bytes/{n}:
+    get:
+      summary: Random Bytes Generator
+      description: Generates and returns the specified number of random bytes (up to 100KB).
+      parameters:
+        - in: path
+          name: n
+          schema:
+            type: integer
+          required: true
+          description: Number of random bytes to generate.
+      responses:
+        "200":
+          description: Random bytes.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /cookies:
+    get:
+      summary: Cookies
+      description: Returns the cookies sent with the request.
+      responses:
+        "200":
+          description: Request cookies.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /cookies/set:
+    post:
+      summary: Set Cookies
+      description: Sets a cookie with the provided name and value.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type: string
+      responses:
+        "200":
+          description: Cookie set message.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /image/{format}:
+    get:
+      summary: Images
+      description: Returns an image in the specified format (`png`, `jpeg`, `webp`, `svg`).
+      parameters:
+        - in: path
+          name: format
+          schema:
+            type: string
+          required: true
+          description: Image format to return.
+      responses:
+        "200":
+          description: Image.
+          content:
+            image/png: {}
+            image/jpeg: {}
+            image/webp: {}
+            image/svg+xml: {}
+  /json:
+    get:
+      summary: JSON Response
+      description: Returns a sample JSON document.
+      responses:
+        "200":
+          description: JSON document.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  slideshow:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      date:
+                        type: string
+                      author:
+                        type: string
+                      slides:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                            title:
+                              type: string
+                            items:
+                              type: array
+                              items:
+                                type: string
+  /xml:
+    get:
+      summary: XML Response
+      description: Returns a sample XML document.
+      responses:
+        "200":
+          description: XML document.
+          content:
+            application/xml:
+              schema:
+                type: string
+  /forms/post:
+    post:
+      summary: Form Data
+      description: Returns form data sent in a POST request.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+      responses:
+        "200":
+          description: Form data.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /redirect/{n}:
+    get:
+      summary: Redirect
+      description: Redirects to a different URL `n` times.
+      parameters:
+        - in: path
+          name: n
+          schema:
+            type: integer
+          required: true
+          description: Number of times to redirect.
+      responses:
+        "302":
+          description: Redirection.
+  /stream/{n}:
+    get:
+      summary: Stream
+      description: Streams data incrementally `n` times.
+      parameters:
+        - in: path
+          name: n
+          schema:
+            type: integer
+          required: true
+          description: Number of times to stream data.
+      responses:
+        "200":
+          description: Streamed data.
+  /{path*}:
+    get:
+      summary: Anything
+      description: Returns anything that is sent to the server.
+      parameters:
+        - in: path
+          name: path
+          schema:
+            type: string
+          required: true
+          description: Path to return.
+      responses:
+        "200":
+          description: Anything response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  method:
+                    type: string
+                  headers:
+                    type: object
+                    additionalProperties:
+                      type: string
+                  query:
+                    type: object
+                    additionalProperties:
+                      type: string
+                  body:
+                    type: object
+                    additionalProperties:
+                      type: string

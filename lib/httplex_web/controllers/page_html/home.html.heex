@@ -1,0 +1,55 @@
+<.flash_group flash={@flash} />
+
+<div id="swagger-ui" class="mt-8"></div>
+
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <h2 class="text-2xl font-semibold mb-4">License</h2>
+
+  <p class="mb-8">
+    The code is available as open source under the terms of the <a
+      href="https://opensource.org/licenses/MIT"
+      class="text-blue-600 hover:underline"
+    >MIT License</a>.
+  </p>
+
+  <h2 class="text-2xl font-semibold mb-4">Contributing</h2>
+
+  <p class="mb-8">
+    Bug reports and pull requests are welcome on GitHub at <a
+      href="https://github.com/abhinavs/httplex"
+      class="text-blue-600 hover:underline"
+    >https://github.com/abhinavs/httplex</a>.
+  </p>
+
+  <p class="text-lg">
+    ✨⚡You can read more about me on my
+    <a href="https://www.abhinav.co/about/" class="text-blue-600 hover:underline">blog</a>
+    or follow me on Twitter -
+    <a href="https://twitter.com/abhinav" class="text-blue-600 hover:underline">@abhinav</a>
+  </p>
+</div>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js">
+</script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js"
+>
+</script>
+<script>
+  window.onload = function () {
+      const ui = SwaggerUIBundle({
+          url: "/httplex_openapi.yaml",
+          dom_id: "#swagger-ui",
+          presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset,
+          ],
+          // layout: "StandaloneLayout",
+      });
+      window.ui = ui;
+  };
+</script>
