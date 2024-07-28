@@ -1,10 +1,10 @@
 openapi: 3.0.1
 info:
-  title: HTTPlex APIs - test and debug HTTP requests
+  title: HTTPlex - test and debug HTTP requests
   description: HTTPlex is an Elixir-based web service that provides a simple HTTP request and response service. It is inspired from httpbin and helps developers test and debug HTTP requests.
   version: 1.0.0
 servers:
-  - url: http://httplex.org
+  - url: http://httplex.com
 paths:
   /hello:
     get:
