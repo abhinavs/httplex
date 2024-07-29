@@ -11,14 +11,14 @@ config :httplex,
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
-config :httplex, HttplexWeb.Endpoint,
+config :httplex, HTTPlexWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: HttplexWeb.ErrorHTML, json: HttplexWeb.ErrorJSON],
+    formats: [html: HTTPlexWeb.ErrorHTML, json: HTTPlexWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Httplex.PubSub,
+  pubsub_server: HTTPlex.PubSub,
   live_view: [signing_salt: "nFSEl4Eb"]
 
 # Configures the mailer
@@ -28,7 +28,7 @@ config :httplex, HttplexWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :httplex, Httplex.Mailer, adapter: Swoosh.Adapters.Local
+config :httplex, HTTPlex.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,

@@ -1,6 +1,6 @@
-defmodule Httplex do
+defmodule HTTPlex do
   @moduledoc """
-  Httplex keeps the contexts that define your domain
+  HTTPlex keeps the contexts that define your domain
   and business logic.
 
   Contexts are also responsible for managing your data, regardless

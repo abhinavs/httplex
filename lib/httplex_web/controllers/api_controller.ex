@@ -1,5 +1,5 @@
-defmodule HttplexWeb.APIController do
-  use HttplexWeb, :controller
+defmodule HTTPlexWeb.APIController do
+  use HTTPlexWeb, :controller
 
   def index(conn, _params) do
     json(conn, %{message: "Welcome to HTTP Plex!"})

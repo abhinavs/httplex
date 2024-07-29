@@ -1,4 +1,4 @@
-defmodule Httplex.MixProject do
+defmodule HTTPlex.MixProject do
   use Mix.Project
 
   def project do
@@ -18,7 +18,7 @@ defmodule Httplex.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Httplex.Application, []},
+      mod: {HTTPlex.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end

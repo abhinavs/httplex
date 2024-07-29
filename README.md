@@ -4,9 +4,9 @@ HTTPlex is an Elixir-based web service that provides a simple HTTP request and r
 
 ## Features
 
-The project is built using Elixir and the Phoenix framework. It defines a controller (`HttplexWeb.APIController`) that handles various HTTP endpoints. Each function in the controller corresponds to a different feature:
+The project is built using Elixir and the Phoenix framework. It defines a controller (`HTTPlexWeb.APIController`) that handles various HTTP endpoints. Each function in the controller corresponds to a different feature:
 
-- `index/2`: Welcomes users to HTTP Plex.
+- `index/2`: Welcomes users to HTTPlex.
 - `ip/2`: Retrieves and returns the client's IP address.
 - `user_agent/2`: Extracts and returns the User-Agent header.
 - `headers/2`: Collects and returns all request headers.

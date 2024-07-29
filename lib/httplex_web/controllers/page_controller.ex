@@ -1,5 +1,5 @@
-defmodule HttplexWeb.PageController do
-  use HttplexWeb, :controller
+defmodule HTTPlexWeb.PageController do
+  use HTTPlexWeb, :controller
 
   def home(conn, _params) do
     # The home page is often custom made,

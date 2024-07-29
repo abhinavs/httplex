@@ -1,4 +1,4 @@
-defmodule HttplexWeb.Endpoint do
+defmodule HTTPlexWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :httplex
 
   # The session will be stored in the cookie and signed,
@@ -23,7 +23,7 @@ defmodule HttplexWeb.Endpoint do
     at: "/",
     from: :httplex,
     gzip: false,
-    only: HttplexWeb.static_paths()
+    only: HTTPlexWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -48,5 +48,5 @@ defmodule HttplexWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug HttplexWeb.Router
+  plug HTTPlexWeb.Router
 end

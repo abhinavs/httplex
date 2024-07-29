@@ -1,10 +1,10 @@
-defmodule HttplexWeb.PageHTML do
+defmodule HTTPlexWeb.PageHTML do
   @moduledoc """
   This module contains pages rendered by PageController.
 
   See the `page_html` directory for all templates available.
   """
-  use HttplexWeb, :html
+  use HTTPlexWeb, :html
 
   embed_templates "page_html/*"
 end

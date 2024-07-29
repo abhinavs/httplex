@@ -1,5 +1,5 @@
-defmodule HttplexWeb.PageControllerTest do
-  use HttplexWeb.ConnCase
+defmodule HTTPlexWeb.PageControllerTest do
+  use HTTPlexWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")

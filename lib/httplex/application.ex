@@ -1,4 +1,4 @@
-defmodule Httplex.Application do
+defmodule HTTPlex.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,20 +8,20 @@ defmodule Httplex.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      HttplexWeb.Telemetry,
+      HTTPlexWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:httplex, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Httplex.PubSub},
+      {Phoenix.PubSub, name: HTTPlex.PubSub},
       # Start the Finch HTTP client for sending emails
-      {Finch, name: Httplex.Finch},
-      # Start a worker by calling: Httplex.Worker.start_link(arg)
-      # {Httplex.Worker, arg},
+      {Finch, name: HTTPlex.Finch},
+      # Start a worker by calling: HTTPlex.Worker.start_link(arg)
+      # {HTTPlex.Worker, arg},
       # Start to serve requests, typically the last entry
-      HttplexWeb.Endpoint
+      HTTPlexWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Httplex.Supervisor]
+    opts = [strategy: :one_for_one, name: HTTPlex.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
@@ -29,7 +29,7 @@ defmodule Httplex.Application do
   # whenever the application is updated.
   @impl true
   def config_change(changed, _new, removed) do
-    HttplexWeb.Endpoint.config_change(changed, removed)
+    HTTPlexWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end

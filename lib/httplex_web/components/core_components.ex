@@ -1,4 +1,4 @@
-defmodule HttplexWeb.CoreComponents do
+defmodule HTTPlexWeb.CoreComponents do
   @moduledoc """
   Provides core UI components.
 
@@ -17,7 +17,7 @@ defmodule HttplexWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import HttplexWeb.Gettext
+  import HTTPlexWeb.Gettext
 
   @doc """
   Renders a modal.
@@ -661,9 +661,9 @@ defmodule HttplexWeb.CoreComponents do
     # with our gettext backend as first argument. Translations are
     # available in the errors.po file (as we use the "errors" domain).
     if count = opts[:count] do
-      Gettext.dngettext(HttplexWeb.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(HTTPlexWeb.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(HttplexWeb.Gettext, "errors", msg, opts)
+      Gettext.dgettext(HTTPlexWeb.Gettext, "errors", msg, opts)
     end
   end
 

@@ -1,11 +1,11 @@
-defmodule HttplexWeb.Router do
-  use HttplexWeb, :router
+defmodule HTTPlexWeb.Router do
+  use HTTPlexWeb, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, html: {HttplexWeb.Layouts, :root}
+    plug :put_root_layout, html: {HTTPlexWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -15,7 +15,7 @@ defmodule HttplexWeb.Router do
     plug CORSPlug
   end
 
-  scope "/", HttplexWeb do
+  scope "/", HTTPlexWeb do
     pipe_through :browser
     get "/", PageController, :home
   end
@@ -32,12 +32,12 @@ defmodule HttplexWeb.Router do
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: HttplexWeb.Telemetry
+      live_dashboard "/dashboard", metrics: HTTPlexWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
 
-  scope "/", HttplexWeb do
+  scope "/", HTTPlexWeb do
     pipe_through :api
     get "/hello", APIController, :index
     get "/ip", APIController, :ip

@@ -1,12 +1,12 @@
-defmodule HttplexWeb do
+defmodule HTTPlexWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
-      use HttplexWeb, :controller
-      use HttplexWeb, :html
+      use HTTPlexWeb, :controller
+      use HTTPlexWeb, :html
 
   The definitions below will be executed for every controller,
   component, etc, so keep them short and clean, focused
@@ -41,10 +41,10 @@ defmodule HttplexWeb do
     quote do
       use Phoenix.Controller,
         formats: [:html, :json],
-        layouts: [html: HttplexWeb.Layouts]
+        layouts: [html: HTTPlexWeb.Layouts]
 
       import Plug.Conn
-      import HttplexWeb.Gettext
+      import HTTPlexWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -53,7 +53,7 @@ defmodule HttplexWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {HttplexWeb.Layouts, :app}
+        layout: {HTTPlexWeb.Layouts, :app}
 
       unquote(html_helpers())
     end
@@ -85,8 +85,8 @@ defmodule HttplexWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
-      import HttplexWeb.CoreComponents
-      import HttplexWeb.Gettext
+      import HTTPlexWeb.CoreComponents
+      import HTTPlexWeb.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
@@ -99,9 +99,9 @@ defmodule HttplexWeb do
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
-        endpoint: HttplexWeb.Endpoint,
-        router: HttplexWeb.Router,
-        statics: HttplexWeb.static_paths()
+        endpoint: HTTPlexWeb.Endpoint,
+        router: HTTPlexWeb.Router,
+        statics: HTTPlexWeb.static_paths()
     end
   end
 

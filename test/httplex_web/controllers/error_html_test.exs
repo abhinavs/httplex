@@ -1,14 +1,14 @@
-defmodule HttplexWeb.ErrorHTMLTest do
-  use HttplexWeb.ConnCase, async: true
+defmodule HTTPlexWeb.ErrorHTMLTest do
+  use HTTPlexWeb.ConnCase, async: true
 
   # Bring render_to_string/4 for testing custom views
   import Phoenix.Template
 
   test "renders 404.html" do
-    assert render_to_string(HttplexWeb.ErrorHTML, "404", "html", []) == "Not Found"
+    assert render_to_string(HTTPlexWeb.ErrorHTML, "404", "html", []) == "Not Found"
   end
 
   test "renders 500.html" do
-    assert render_to_string(HttplexWeb.ErrorHTML, "500", "html", []) == "Internal Server Error"
+    assert render_to_string(HTTPlexWeb.ErrorHTML, "500", "html", []) == "Internal Server Error"
   end
 end
