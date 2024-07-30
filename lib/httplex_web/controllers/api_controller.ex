@@ -8,7 +8,7 @@ defmodule HTTPlexWeb.APIController do
 
   @spec ip(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def ip(conn, _params) do
-    json(conn, %{origin: to_string(:inet.ntoa(conn.remote_ip))})
+    json(conn, %{origin: format_ip(conn.remote_ip)})
   end
 
   @spec user_agent(Plug.Conn.t(), any()) :: Plug.Conn.t()
@@ -283,7 +283,7 @@ defmodule HTTPlexWeb.APIController do
       form: conn.body_params,
       data: custom_read_body(conn),
       json: if(json?(conn), do: conn.body_params, else: nil),
-      origin: to_string(:inet.ntoa(conn.remote_ip))
+      origin: format_ip(conn.remote_ip)
     }
   end
 
@@ -319,5 +319,19 @@ defmodule HTTPlexWeb.APIController do
 
     url = "#{url}#{request_path}"
     if query_string != "", do: "#{url}?#{query_string}", else: url
+  end
+
+  defp format_ip(ip) do
+    case ip do
+      {a, b, c, d} ->
+        "#{a}.#{b}.#{c}.#{d}"
+
+      {0, 0, 0, 0, 0, 65535, ab, cd} ->
+        <<a, b, c, d>> = <<ab::16, cd::16>>
+        "#{a}.#{b}.#{c}.#{d}"
+
+      _ ->
+        to_string(:inet.ntoa(ip))
+    end
   end
 end
