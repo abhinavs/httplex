@@ -5,6 +5,44 @@
     "version": "1.0.0",
     "description": "A simple HTTP Request & Response Service."
   },
+  "tags": [
+    {
+      "name": "Hello World",
+      "description": "Basic hello world endpoint"
+    },
+    {
+      "name": "HTTP Methods",
+      "description": "Endpoints demonstrating various HTTP methods"
+    },
+    {
+      "name": "Request inspection",
+      "description": "Endpoints for inspecting request details"
+    },
+    {
+      "name": "Status codes",
+      "description": "Endpoints returning specific status codes"
+    },
+    {
+      "name": "Dynamic data",
+      "description": "Endpoints generating dynamic data"
+    },
+    {
+      "name": "Cookies",
+      "description": "Endpoints for cookie manipulation"
+    },
+    {
+      "name": "Images",
+      "description": "Endpoints serving various image formats"
+    },
+    {
+      "name": "Redirects",
+      "description": "Endpoints demonstrating redirects"
+    },
+    {
+      "name": "Auth",
+      "description": "Authentication-related endpoints"
+    }
+  ],
   "paths": {
     "/hello": {
       "get": {
@@ -23,7 +61,7 @@
           }
         },
         "tags": [
-          "Response formats"
+          "Hello World"
         ]
       }
     },
@@ -510,35 +548,396 @@
         ]
       }
     },
-    "/{anything}": {
+    "/basic-auth/{user}/{passwd}": {
       "get": {
-        "summary": "Anything",
-        "description": "Returns anything passed in request data.",
+        "summary": "Basic Authentication",
+        "description": "Prompts the user for authorization using HTTP Basic Auth.",
+        "tags": [
+          "Auth"
+        ],
         "parameters": [
           {
-            "name": "anything",
+            "name": "user",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Username for authentication"
+          },
+          {
+            "name": "passwd",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Password for authentication"
           }
         ],
         "responses": {
           "200": {
-            "description": "Anything passed in the request",
+            "description": "Successful authentication",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "authenticated": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
-        },
+        }
+      }
+    },
+    "/bearer": {
+      "get": {
+        "summary": "Bearer Token Authentication",
+        "description": "Authenticates using a bearer token provided in the Authorization header.",
         "tags": [
-          "Anything"
-        ]
+          "Auth"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Bearer token. Format: 'Bearer {token}'",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authenticated": {
+                      "type": "boolean"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/hidden-basic-auth/{user}/{passwd}": {
+      "get": {
+        "summary": "Hidden Basic Authentication",
+        "description": "Prompts the user for authorization using HTTP Basic Auth, but does not send a WWW-Authenticate header.",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Username for authentication"
+          },
+          {
+            "name": "passwd",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Password for authentication"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authenticated": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found (used instead of 401 to hide the existence of the endpoint)"
+          }
+        }
+      }
+    },
+    "/digest-auth/{qop}/{user}/{passwd}": {
+      "get": {
+        "summary": "Digest Authentication",
+        "description": "Prompts the user for authorization using HTTP Digest Auth.",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "qop",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "auth",
+                "auth-int"
+              ]
+            },
+            "description": "Quality of Protection"
+          },
+          {
+            "name": "user",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Username for authentication"
+          },
+          {
+            "name": "passwd",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Password for authentication"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authenticated": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/digest-auth/{qop}/{user}/{passwd}/{algorithm}": {
+      "get": {
+        "summary": "Digest Authentication with Algorithm",
+        "description": "Prompts the user for authorization using HTTP Digest Auth with a specified algorithm.",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "qop",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "auth",
+                "auth-int"
+              ]
+            },
+            "description": "Quality of Protection"
+          },
+          {
+            "name": "user",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Username for authentication"
+          },
+          {
+            "name": "passwd",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Password for authentication"
+          },
+          {
+            "name": "algorithm",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "MD5",
+                "SHA-256"
+              ]
+            },
+            "description": "Hashing algorithm to use"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authenticated": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/digest-auth/{qop}/{user}/{passwd}/{algorithm}/{stale_after}": {
+      "get": {
+        "summary": "Digest Authentication with Stale After",
+        "description": "Prompts the user for authorization using HTTP Digest Auth with a specified algorithm and stale after value.",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "qop",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "auth",
+                "auth-int"
+              ]
+            },
+            "description": "Quality of Protection"
+          },
+          {
+            "name": "user",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Username for authentication"
+          },
+          {
+            "name": "passwd",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Password for authentication"
+          },
+          {
+            "name": "algorithm",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "MD5",
+                "SHA-256"
+              ]
+            },
+            "description": "Hashing algorithm to use"
+          },
+          {
+            "name": "stale_after",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Number of uses before the nonce becomes stale"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authenticated": {
+                      "type": "boolean"
+                    },
+                    "user": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

@@ -1,6 +1,8 @@
 defmodule HTTPlexWeb.APIController do
   use HTTPlexWeb, :controller
 
+  @realm "abhinav@httplex.com"
+
   @spec index(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def index(conn, _params) do
     json(conn, %{message: "Welcome to HTTPlex!"})
@@ -45,6 +47,95 @@ defmodule HTTPlexWeb.APIController do
   @spec delete(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def delete(conn, _params) do
     json(conn, request_info(conn))
+  end
+
+  @spec basic_auth(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def basic_auth(conn, %{"user" => user, "passwd" => passwd}) do
+    case get_req_header(conn, "authorization") do
+      ["Basic " <> encoded] ->
+        case Base.decode64(encoded) do
+          {:ok, decoded} ->
+            [provided_user, provided_passwd] = String.split(decoded, ":", parts: 2)
+
+            if provided_user == user && provided_passwd == passwd do
+              json(conn, %{authenticated: true, user: user})
+            else
+              send_resp(conn, 401, "Unauthorized")
+            end
+
+          _ ->
+            send_unauthorized(conn)
+        end
+
+      _ ->
+        send_unauthorized(conn)
+    end
+  end
+
+  @spec bearer(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  def bearer(conn, _params) do
+    case get_req_header(conn, "authorization") do
+      ["Bearer " <> token] ->
+        # In a real application, you would validate the token here
+        # We'll just check if the token is not empty
+        if token != "" do
+          json(conn, %{authenticated: true, token: token})
+        else
+          send_resp(conn, 401, "Unauthorized")
+        end
+
+      _ ->
+        conn
+        |> put_resp_header("www-authenticate", "Bearer realm=\"example\"")
+        |> send_resp(401, "Unauthorized")
+    end
+  end
+
+  @spec digest_auth(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def digest_auth(conn, %{
+        "qop" => qop,
+        "user" => user,
+        "passwd" => passwd,
+        "algorithm" => algorithm,
+        "stale_after" => stale_after
+      }) do
+    stale_after = String.to_integer(stale_after)
+    handle_digest_auth(conn, qop, user, passwd, algorithm, stale_after)
+  end
+
+  def digest_auth(conn, %{
+        "qop" => qop,
+        "user" => user,
+        "passwd" => passwd,
+        "algorithm" => algorithm
+      }) do
+    handle_digest_auth(conn, qop, user, passwd, algorithm, nil)
+  end
+
+  def digest_auth(conn, %{"qop" => qop, "user" => user, "passwd" => passwd}) do
+    handle_digest_auth(conn, qop, user, passwd, "MD5", nil)
+  end
+
+  def hidden_basic_auth(conn, %{"user" => user, "passwd" => passwd}) do
+    case get_req_header(conn, "authorization") do
+      ["Basic " <> encoded] ->
+        case Base.decode64(encoded) do
+          {:ok, decoded} ->
+            [provided_user, provided_passwd] = String.split(decoded, ":", parts: 2)
+
+            if provided_user == user && provided_passwd == passwd do
+              json(conn, %{authenticated: true, user: user})
+            else
+              send_resp(conn, 404, "Not Found")
+            end
+
+          _ ->
+            send_resp(conn, 404, "Not Found")
+        end
+
+      _ ->
+        send_resp(conn, 404, "Not Found")
+    end
   end
 
   @spec status(Plug.Conn.t(), map()) :: Plug.Conn.t()
@@ -98,6 +189,7 @@ defmodule HTTPlexWeb.APIController do
       case format do
         "png" -> "priv/static/images/sample.png"
         "jpeg" -> "priv/static/images/sample.jpeg"
+        "jpg" -> "priv/static/images/sample.jpg"
         "webp" -> "priv/static/images/sample.webp"
         "svg" -> "priv/static/images/sample.svg"
         _ -> "priv/static/images/sample.png"
@@ -343,5 +435,91 @@ defmodule HTTPlexWeb.APIController do
       _ ->
         to_string(:inet.ntoa(ip))
     end
+  end
+
+  defp handle_digest_auth(conn, qop, user, passwd, algorithm, stale_after) do
+    case get_req_header(conn, "authorization") do
+      ["Digest " <> credentials] ->
+        creds = parse_digest_credentials(credentials)
+
+        if check_digest_auth(creds, user, passwd, conn.method, conn.request_path, algorithm) do
+          if stale_after && stale_after > 0 do
+            conn
+            |> put_resp_header("authentication-info", "nextnonce=#{generate_nonce()}")
+            |> json(%{authenticated: true, user: user})
+          else
+            json(conn, %{authenticated: true, user: user})
+          end
+        else
+          send_digest_challenge(conn, qop, algorithm, false)
+        end
+
+      _ ->
+        send_digest_challenge(conn, qop, algorithm, false)
+    end
+  end
+
+  defp send_digest_challenge(conn, qop, algorithm, stale) do
+    nonce = generate_nonce()
+    opaque = generate_opaque()
+
+    conn
+    |> put_resp_header(
+      "www-authenticate",
+      "Digest realm=\"#{@realm}\", qop=\"#{qop}\", nonce=\"#{nonce}\", opaque=\"#{opaque}\", algorithm=#{algorithm}, stale=#{stale}"
+    )
+    |> send_resp(401, "Unauthorized")
+  end
+
+  defp check_digest_auth(creds, user, passwd, method, uri, algorithm) do
+    hash_algo =
+      case String.downcase(algorithm) do
+        "sha-256" -> :sha256
+        "md5" -> :md5
+        _ -> raise "Unsupported algorithm: #{algorithm}"
+      end
+
+    ha1 = :crypto.hash(hash_algo, "#{user}:#{@realm}:#{passwd}") |> Base.encode16(case: :lower)
+    ha2 = :crypto.hash(hash_algo, "#{method}:#{uri}") |> Base.encode16(case: :lower)
+
+    response =
+      case creds[:qop] do
+        nil ->
+          :crypto.hash(hash_algo, "#{ha1}:#{creds[:nonce]}:#{ha2}") |> Base.encode16(case: :lower)
+
+        "auth" ->
+          :crypto.hash(
+            hash_algo,
+            "#{ha1}:#{creds[:nonce]}:#{creds[:nc]}:#{creds[:cnonce]}:#{creds[:qop]}:#{ha2}"
+          )
+          |> Base.encode16(case: :lower)
+      end
+
+    creds[:response] == response
+  end
+
+  defp parse_digest_credentials(credentials) do
+    credentials
+    |> String.split(",")
+    |> Enum.map(&String.trim/1)
+    |> Enum.map(fn pair ->
+      [key, value] = String.split(pair, "=", parts: 2)
+      {String.to_atom(key), String.trim(value, "\"")}
+    end)
+    |> Enum.into(%{})
+  end
+
+  defp generate_nonce do
+    :crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)
+  end
+
+  defp generate_opaque do
+    :crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)
+  end
+
+  defp send_unauthorized(conn) do
+    conn
+    |> put_resp_header("www-authenticate", "Basic realm=\"HTTPlex\"")
+    |> send_resp(401, "Unauthorized")
   end
 end

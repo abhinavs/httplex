@@ -53,6 +53,125 @@ defmodule HTTPlexWeb.APIControllerTest do
     end
   end
 
+  describe "Digest Authentication" do
+    test "GET /digest-auth/{qop}/{user}/{passwd} - initial request", %{conn: conn} do
+      conn = get(conn, ~p"/digest-auth/auth/testuser/testpass")
+      assert response(conn, 401) =~ "Unauthorized"
+      assert get_resp_header(conn, "www-authenticate") |> List.first() =~ ~r/Digest/
+    end
+
+    test "GET /digest-auth/{qop}/{user}/{passwd} - successful auth", %{conn: conn} do
+      conn =
+        perform_digest_auth(
+          conn,
+          "/digest-auth/auth/testuser/testpass",
+          "testuser",
+          "testpass",
+          "MD5"
+        )
+
+      assert json_response(conn, 200) == %{"authenticated" => true, "user" => "testuser"}
+    end
+
+    test "GET /digest-auth/{qop}/{user}/{passwd}/{algorithm} - successful auth with SHA-256", %{
+      conn: conn
+    } do
+      conn =
+        perform_digest_auth(
+          conn,
+          "/digest-auth/auth/testuser/testpass/SHA-256",
+          "testuser",
+          "testpass",
+          "SHA-256"
+        )
+
+      assert json_response(conn, 200) == %{"authenticated" => true, "user" => "testuser"}
+    end
+
+    test "GET /digest-auth/{qop}/{user}/{passwd}/{algorithm}/{stale_after} - stale nonce", %{
+      conn: conn
+    } do
+      # First request should succeed
+      conn =
+        perform_digest_auth(
+          conn,
+          "/digest-auth/auth/testuser/testpass/MD5/1",
+          "testuser",
+          "testpass",
+          "MD5"
+        )
+
+      assert json_response(conn, 200) == %{"authenticated" => true, "user" => "testuser"}
+      assert get_resp_header(conn, "authentication-info") |> List.first() =~ ~r/nextnonce=/
+
+      # Second request should succeed with a new nonce
+      conn =
+        perform_digest_auth(
+          conn,
+          "/digest-auth/auth/testuser/testpass/MD5/1",
+          "testuser",
+          "testpass",
+          "MD5"
+        )
+
+      assert json_response(conn, 200) == %{"authenticated" => true, "user" => "testuser"}
+    end
+  end
+
+  # Helper function to perform digest authentication
+  defp perform_digest_auth(conn, path, username, password, algorithm) do
+    # Get the challenge
+    challenge_conn = get(conn, path)
+
+    case get_resp_header(challenge_conn, "www-authenticate") do
+      [] ->
+        # If we don't get a www-authenticate header, return the conn as is
+        challenge_conn
+
+      [auth_header] ->
+        %{nonce: nonce, realm: realm} = parse_www_authenticate(auth_header)
+
+        # Generate the response
+        hash_algo =
+          case String.downcase(algorithm) do
+            "sha-256" -> :sha256
+            "md5" -> :md5
+            _ -> raise "Unsupported algorithm: #{algorithm}"
+          end
+
+        ha1 =
+          :crypto.hash(hash_algo, "#{username}:#{realm}:#{password}")
+          |> Base.encode16(case: :lower)
+
+        ha2 = :crypto.hash(hash_algo, "GET:#{path}") |> Base.encode16(case: :lower)
+
+        response =
+          :crypto.hash(hash_algo, "#{ha1}:#{nonce}:00000001:0a4f113b:auth:#{ha2}")
+          |> Base.encode16(case: :lower)
+
+        # Make the authenticated request
+        auth_header =
+          "Digest username=\"#{username}\", realm=\"#{realm}\", nonce=\"#{nonce}\", uri=\"#{path}\", qop=auth, nc=00000001, cnonce=\"0a4f113b\", response=\"#{response}\", opaque=\"\""
+
+        build_conn()
+        |> put_req_header("authorization", auth_header)
+        |> get(path)
+    end
+  end
+
+  # Helper function to parse WWW-Authenticate header
+  defp parse_www_authenticate(header) do
+    header
+    |> String.replace("Digest ", "")
+    |> String.split(",")
+    |> Enum.map(&String.trim/1)
+    |> Enum.map(fn pair ->
+      [key, value] = String.split(pair, "=", parts: 2)
+      {String.to_atom(key), String.trim(value, "\"")}
+    end)
+    |> Enum.into(%{})
+  end
+
   describe "Status and delay" do
     test "GET /status/:code", %{conn: conn} do
       conn = get(conn, ~p"/status/418")
@@ -102,7 +221,7 @@ defmodule HTTPlexWeb.APIControllerTest do
     end
 
     test "GET /image/:format", %{conn: conn} do
-      for format <- ["png", "jpeg", "webp", "svg"] do
+      for format <- ["png", "jpeg", "jpg", "webp", "svg"] do
         conn = get(conn, ~p"/image/#{format}")
         assert get_resp_header(conn, "content-type") == ["image/#{format}; charset=utf-8"]
       end
@@ -161,6 +280,87 @@ defmodule HTTPlexWeb.APIControllerTest do
       assert is_map(response["body"])
       assert is_map(response["query"])
       assert String.contains?(response["url"], "/anything/test")
+    end
+  end
+
+  describe "Bearer Token Authentication" do
+    test "GET /bearer - successful auth", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer valid_token")
+        |> get(~p"/bearer")
+
+      assert json_response(conn, 200) == %{"authenticated" => true, "token" => "valid_token"}
+    end
+
+    test "GET /bearer - failed auth", %{conn: conn} do
+      conn = get(conn, ~p"/bearer")
+
+      assert response(conn, 401) == "Unauthorized"
+      assert get_resp_header(conn, "www-authenticate") == ["Bearer realm=\"example\""]
+    end
+  end
+
+  describe "Hidden Basic Authentication" do
+    test "GET /hidden-basic-auth/:user/:passwd - successful auth", %{conn: conn} do
+      auth = Base.encode64("testuser:testpass")
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Basic #{auth}")
+        |> get(~p"/hidden-basic-auth/testuser/testpass")
+
+      assert json_response(conn, 200) == %{"authenticated" => true, "user" => "testuser"}
+    end
+
+    test "GET /hidden-basic-auth/:user/:passwd - failed auth", %{conn: conn} do
+      conn = get(conn, ~p"/hidden-basic-auth/testuser/testpass")
+
+      assert response(conn, 404) == "Not Found"
+      assert get_resp_header(conn, "www-authenticate") == []
+    end
+
+    test "GET /hidden-basic-auth/:user/:passwd - wrong credentials", %{conn: conn} do
+      auth = Base.encode64("wronguser:wrongpass")
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Basic #{auth}")
+        |> get(~p"/hidden-basic-auth/testuser/testpass")
+
+      assert response(conn, 404) == "Not Found"
+      assert get_resp_header(conn, "www-authenticate") == []
+    end
+  end
+
+  describe "Basic Authentication" do
+    test "GET /basic-auth/:user/:passwd - successful auth", %{conn: conn} do
+      auth = Base.encode64("testuser:testpass")
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Basic #{auth}")
+        |> get(~p"/basic-auth/testuser/testpass")
+
+      assert json_response(conn, 200) == %{"authenticated" => true, "user" => "testuser"}
+    end
+
+    test "GET /basic-auth/:user/:passwd - failed auth", %{conn: conn} do
+      conn = get(conn, ~p"/basic-auth/testuser/testpass")
+
+      assert response(conn, 401) == "Unauthorized"
+      assert get_resp_header(conn, "www-authenticate") == ["Basic realm=\"HTTPlex\""]
+    end
+
+    test "GET /basic-auth/:user/:passwd - wrong credentials", %{conn: conn} do
+      auth = Base.encode64("wronguser:wrongpass")
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Basic #{auth}")
+        |> get(~p"/basic-auth/testuser/testpass")
+
+      assert response(conn, 401) == "Unauthorized"
     end
   end
 end

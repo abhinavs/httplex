@@ -48,6 +48,12 @@ defmodule HTTPlexWeb.Router do
     put "/put", APIController, :put
     patch "/patch", APIController, :patch
     delete "/delete", APIController, :delete
+    get "/basic-auth/:user/:passwd", APIController, :basic_auth
+    get "/bearer", APIController, :bearer
+    get "/digest-auth/:qop/:user/:passwd", APIController, :digest_auth
+    get "/digest-auth/:qop/:user/:passwd/:algorithm", APIController, :digest_auth
+    get "/digest-auth/:qop/:user/:passwd/:algorithm/:stale_after", APIController, :digest_auth
+    get "/hidden-basic-auth/:user/:passwd", APIController, :hidden_basic_auth
     get "/status/:code", APIController, :status
     get "/delay/:n", APIController, :delay
     get "/base64/:value", APIController, :decode_base64
