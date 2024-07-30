@@ -60,9 +60,19 @@ defmodule HTTPlexWeb.Router do
     get "/digest-auth/:qop/:user/:passwd/:algorithm/:stale_after", APIController, :digest_auth
     get "/hidden-basic-auth/:user/:passwd", APIController, :hidden_basic_auth
     get "/status/:code", APIController, :status
-    get "/delay/:n", APIController, :delay
+    get "/delay/:delay", APIController, :delay
+    post "/delay/:delay", APIController, :delay
+    put "/delay/:delay", APIController, :delay
+    patch "/delay/:delay", APIController, :delay
+    delete "/delay/:delay", APIController, :delay
     get "/base64/:value", APIController, :decode_base64
     get "/bytes/:n", APIController, :random_bytes
+    get "/drip", APIController, :drip
+    get "/links/:n/:offset", APIController, :links
+    get "/range/:numbytes", APIController, :range
+    get "/stream-bytes/:n", APIController, :stream_bytes
+    get "/stream/:n", APIController, :stream_json
+    get "/uuid", APIController, :uuid
     get "/cookies", APIController, :cookies
     post "/cookies/set", APIController, :set_cookies
     get "/image/:format", APIController, :image
@@ -72,13 +82,12 @@ defmodule HTTPlexWeb.Router do
     get "/deny", APIController, :deny
     get "/encoding/utf8", APIController, :encoding_utf8
     get "/gzip", APIController, :gzip
-    get "/html", APIController, :html
+    get "/html", APIController, :html_response
     get "/json", APIController, :json_response
     get "/robots.txt", APIController, :robots_txt
     get "/xml", APIController, :xml
     post "/forms/post", APIController, :forms_post
     get "/redirect/:n", APIController, :redirectx
-    get "/stream/:n", APIController, :stream
     get "/*path", APIController, :anything
   end
 end

@@ -286,21 +286,23 @@
         }
       }
     },
-    "/delay/{n}": {
+    "/delay/{delay}": {
       "get": {
-        "summary": "Delay Response",
-        "description": "Delays the response for n seconds.",
+        "summary": "Delayed response",
+        "description": "Returns a delayed response (max of 10 seconds).",
         "tags": [
           "Dynamic data"
         ],
         "parameters": [
           {
-            "name": "n",
+            "name": "delay",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer"
-            }
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Delay in seconds"
           }
         ],
         "responses": {
@@ -312,7 +314,7 @@
                   "type": "object",
                   "properties": {
                     "delay": {
-                      "type": "integer"
+                      "type": "number"
                     }
                   }
                 }
@@ -320,32 +322,76 @@
             }
           }
         }
+      },
+      "post": {
+        "$ref": "#/paths/~1delay~1{delay}/get",
+        "tags": [
+          "Dynamic data"
+        ],
+      },
+      "put": {
+        "$ref": "#/paths/~1delay~1{delay}/get",
+        "tags": [
+          "Dynamic data"
+        ],
+      },
+      "patch": {
+        "$ref": "#/paths/~1delay~1{delay}/get",
+        "tags": [
+          "Dynamic data"
+        ],
+      },
+      "delete": {
+        "$ref": "#/paths/~1delay~1{delay}/get",
+        "tags": [
+          "Dynamic data"
+        ],
       }
     },
-    "/base64/{value}": {
+    "/drip": {
       "get": {
-        "summary": "Decode Base64",
-        "description": "Decodes base64url-encoded string.",
+        "summary": "Drip data",
+        "description": "Drips data over a duration after an optional initial delay.",
         "tags": [
           "Dynamic data"
         ],
         "parameters": [
           {
-            "name": "value",
-            "in": "path",
-            "required": true,
+            "name": "duration",
+            "in": "query",
             "schema": {
-              "type": "string"
-            }
+              "type": "number",
+              "default": 2
+            },
+            "description": "The amount of time (in seconds) over which to drip the data"
+          },
+          {
+            "name": "numbytes",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "The number of bytes to respond with"
+          },
+          {
+            "name": "delay",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 2
+            },
+            "description": "The amount of time (in seconds) to delay before starting to drip"
           }
         ],
         "responses": {
           "200": {
-            "description": "Decoded data",
+            "description": "Dripped data",
             "content": {
-              "text/plain": {
+              "application/octet-stream": {
                 "schema": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -353,10 +399,10 @@
         }
       }
     },
-    "/bytes/{n}": {
+    "/links/{n}/{offset}": {
       "get": {
-        "summary": "Random Bytes",
-        "description": "Returns n random bytes generated with given seed.",
+        "summary": "Generate links",
+        "description": "Generate a page containing n links to other pages which do the same.",
         "tags": [
           "Dynamic data"
         ],
@@ -367,17 +413,166 @@
             "required": true,
             "schema": {
               "type": "integer"
+            },
+            "description": "Number of links to generate"
+          },
+          {
+            "name": "offset",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Offset for link numbering"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTML page with links",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
             }
+          }
+        }
+      }
+    },
+    "/range/{numbytes}": {
+      "get": {
+        "summary": "Bytes range",
+        "description": "Streams n random bytes generated with given seed, at given chunk size per packet.",
+        "tags": [
+          "Dynamic data"
+        ],
+        "parameters": [
+          {
+            "name": "numbytes",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of bytes to return"
           }
         ],
         "responses": {
           "200": {
             "description": "Random bytes",
+            "headers": {
+              "Content-Range": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/octet-stream": {
                 "schema": {
                   "type": "string",
                   "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stream-bytes/{n}": {
+      "get": {
+        "summary": "Stream bytes",
+        "description": "Streams n random bytes generated with given seed, at given chunk size per packet.",
+        "tags": [
+          "Dynamic data"
+        ],
+        "parameters": [
+          {
+            "name": "n",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of bytes to stream"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Streamed random bytes",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stream/{n}": {
+      "get": {
+        "summary": "Stream JSON",
+        "description": "Stream n JSON responses",
+        "tags": [
+          "Dynamic data"
+        ],
+        "parameters": [
+          {
+            "name": "n",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of JSON objects to stream"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Streamed JSON objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/uuid": {
+      "get": {
+        "summary": "UUID",
+        "description": "Return a UUID4.",
+        "tags": [
+          "Dynamic data"
+        ],
+        "responses": {
+          "200": {
+            "description": "UUID4",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "uuid": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
                 }
               }
             }

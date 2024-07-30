@@ -172,32 +172,113 @@ defmodule HTTPlexWeb.APIControllerTest do
     |> Enum.into(%{})
   end
 
-  describe "Status and delay" do
+  describe "Status" do
     test "GET /status/:code", %{conn: conn} do
       conn = get(conn, ~p"/status/418")
       assert response(conn, 418) == ""
     end
+  end
 
-    test "GET /delay/:n", %{conn: conn} do
-      start_time = System.monotonic_time(:millisecond)
-      conn = get(conn, ~p"/delay/1")
-      end_time = System.monotonic_time(:millisecond)
+  describe "Base64 decode" do
+    test "GET /base64/{value} decodes base64url-encoded string", %{conn: conn} do
+      encoded = "SGVsbG8sIFdvcmxkIQ=="
+      conn = get(conn, ~p"/base64/#{encoded}")
+      assert response(conn, 200) == "Hello, World!"
+    end
 
-      assert json_response(conn, 200) == %{"delay" => 1}
-      assert end_time - start_time >= 1000
+    test "GET /base64/{value} returns 400 for invalid base64", %{conn: conn} do
+      conn = get(conn, ~p"/base64/invalid_base64")
+      assert response(conn, 400) == "Invalid base64 encoding"
     end
   end
 
-  describe "Encoding and bytes" do
-    test "GET /base64/:value", %{conn: conn} do
-      encoded = Base.url_encode64("Hello, World!")
-      conn = get(conn, ~p"/base64/#{encoded}")
-      assert text_response(conn, 200) == "Hello, World!"
+  describe "Random bytes" do
+    test "GET /bytes/{n} returns n random bytes", %{conn: conn} do
+      n = 10
+      conn = get(conn, ~p"/bytes/#{n}")
+      assert response(conn, 200)
+      assert byte_size(response(conn, 200)) == n
+    end
+  end
+
+  describe "Delayed response" do
+    test "GET /delay/{delay} returns after specified delay", %{conn: conn} do
+      delay = 2
+      start_time = System.system_time(:millisecond)
+      conn = get(conn, ~p"/delay/#{delay}")
+      end_time = System.system_time(:millisecond)
+
+      assert json_response(conn, 200) == %{"delay" => delay}
+      assert end_time - start_time >= delay * 1000
     end
 
-    test "GET /bytes/:n", %{conn: conn} do
-      conn = get(conn, ~p"/bytes/10")
-      assert byte_size(response(conn, 200)) == 10
+    test "POST /delay/{delay} returns after specified delay", %{conn: conn} do
+      delay = 2
+      start_time = System.system_time(:millisecond)
+      conn = post(conn, ~p"/delay/#{delay}")
+      end_time = System.system_time(:millisecond)
+
+      assert json_response(conn, 200) == %{"delay" => delay}
+      assert end_time - start_time >= delay * 1000
+    end
+
+    # Similar tests for PUT, PATCH, and DELETE...
+  end
+
+  describe "Drip data" do
+    test "GET /drip returns data over time", %{conn: conn} do
+      conn = get(conn, ~p"/drip?duration=1.0&numbytes=5&delay=1.0")
+      assert response(conn, 200)
+      assert byte_size(response(conn, 200)) == 5
+    end
+  end
+
+  describe "Generate links" do
+    test "GET /links/{n}/{offset} generates n links", %{conn: conn} do
+      n = 5
+      offset = 0
+      conn = get(conn, ~p"/links/#{n}/#{offset}")
+      assert response(conn, 200)
+      assert response(conn, 200) =~ "<a href=\"/links/5/1\">/links/5/1</a>"
+      assert response(conn, 200) =~ "<a href=\"/links/5/5\">/links/5/5</a>"
+    end
+  end
+
+  describe "Bytes range" do
+    test "GET /range/{numbytes} returns specified number of bytes", %{conn: conn} do
+      numbytes = 100
+      conn = get(conn, ~p"/range/#{numbytes}")
+      assert response(conn, 200)
+      assert byte_size(response(conn, 200)) == numbytes
+      assert get_resp_header(conn, "content-range") == ["bytes 0-99/100"]
+    end
+  end
+
+  describe "Stream bytes" do
+    test "GET /stream-bytes/{n} streams n bytes", %{conn: conn} do
+      n = 100
+      conn = get(conn, ~p"/stream-bytes/#{n}")
+      assert response(conn, 200)
+      assert byte_size(response(conn, 200)) == n
+    end
+  end
+
+  describe "Stream JSON" do
+    test "GET /stream/{n} streams n JSON objects", %{conn: conn} do
+      conn = get(conn, ~p"/stream/3")
+      assert response_content_type(conn, :json)
+      # {:ok, _} = Plug.Conn.sent_resp(conn)
+      # assert conn.state == :chunked
+      assert response_content_type(conn, :json)
+      assert json_response(conn, 200) == [3, 2, 1]
+    end
+  end
+
+  describe "UUID" do
+    test "GET /uuid returns a valid UUID", %{conn: conn} do
+      conn = get(conn, ~p"/uuid")
+      assert %{"uuid" => uuid} = json_response(conn, 200)
+      assert {:ok, _} = UUID.info(uuid)
     end
   end
 
@@ -265,17 +346,6 @@ defmodule HTTPlexWeb.APIControllerTest do
     test "GET /redirect/:n stops redirecting when n = 0", %{conn: conn} do
       conn = get(conn, ~p"/redirect/0")
       assert json_response(conn, 200) == %{"message" => "Redirect completed"}
-    end
-  end
-
-  describe "Streaming" do
-    test "GET /stream/:n", %{conn: conn} do
-      conn = get(conn, ~p"/stream/3")
-      assert response_content_type(conn, :json)
-      # {:ok, _} = Plug.Conn.sent_resp(conn)
-      # assert conn.state == :chunked
-      assert response_content_type(conn, :json)
-      assert json_response(conn, 200) == [3, 2, 1]
     end
   end
 

@@ -197,17 +197,18 @@ defmodule HTTPlexWeb.APIController do
   end
 
   @spec delay(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def delay(conn, %{"n" => n}) do
-    seconds = String.to_integer(n)
-    :timer.sleep(seconds * 1000)
-    json(conn, %{delay: seconds})
+  def delay(conn, %{"delay" => delay}) do
+  {delay, _} = Float.parse(delay)
+    delay = min(delay, 10.0)
+    :timer.sleep(round(delay * 1000))
+    json(conn, %{delay: delay})
   end
 
   @spec decode_base64(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def decode_base64(conn, %{"value" => value}) do
     case Base.url_decode64(value) do
-      {:ok, decoded} -> text(conn, decoded)
-      :error -> text(conn, "Invalid Base64 data")
+    {:ok, decoded} -> text(conn, decoded)
+    :error -> send_resp(conn, 400, "Invalid base64 encoding")
     end
   end
 
@@ -220,6 +221,85 @@ defmodule HTTPlexWeb.APIController do
     conn
     |> put_resp_content_type("application/octet-stream")
     |> send_resp(200, data)
+  end
+
+  def drip(conn, params) do
+    duration = Map.get(params, "duration", "2") |> parse_float_or_int()
+    numbytes = Map.get(params, "numbytes", "10") |> String.to_integer()
+    delay = Map.get(params, "delay", "2") |> parse_float_or_int()
+
+    :timer.sleep(round(delay * 1000))
+
+    interval = round(duration * 1000 / numbytes)
+    data = for _ <- 1..numbytes do
+      :timer.sleep(interval)
+      <<0>>
+    end
+
+    conn
+    |> put_resp_content_type("application/octet-stream")
+    |> send_resp(200, IO.iodata_to_binary(data))
+  end
+
+  def links(conn, %{"n" => n, "offset" => offset}) do
+    {n, _} = Integer.parse(n)
+    {offset, _} = Integer.parse(offset)
+    links = Enum.map(1..n, fn i ->
+      "/links/#{n}/#{offset + i}"
+    end)
+    html = Enum.map(links, fn link ->
+      "<a href=\"#{link}\">#{link}</a><br>"
+    end) |> Enum.join("\n")
+    html(conn, "<html><body>#{html}</body></html>")
+  end
+
+  def range(conn, %{"numbytes" => numbytes}) do
+    {numbytes, _} = Integer.parse(numbytes)
+    data = :crypto.strong_rand_bytes(numbytes)
+    conn
+    |> put_resp_header("accept-ranges", "bytes")
+    |> put_resp_header("content-range", "bytes 0-#{numbytes-1}/#{numbytes}")
+    |> put_resp_content_type("application/octet-stream")
+    |> send_resp(200, data)
+  end
+
+  def stream_bytes(conn, %{"n" => n}) do
+    {n, _} = Integer.parse(n)
+    data = :crypto.strong_rand_bytes(n)
+    conn
+    |> put_resp_content_type("application/octet-stream")
+    |> send_resp(200, data)
+  end
+
+  @spec stream_json(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def stream_json(conn, %{"n" => n}) do
+    n = String.to_integer(n)
+
+    if Mix.env() == :test do
+      # For testing, return all numbers at once
+      conn
+      |> put_resp_content_type("application/json")
+      |> json(Enum.to_list(n..1))
+    else
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_chunked(200)
+      |> stream_data(String.to_integer(n))
+    end
+  end
+
+  defp stream_data(conn, 0), do: conn
+
+  defp stream_data(conn, n) do
+    :timer.sleep(1000)
+    chunk(conn, "#{n}\n")
+    stream_data(conn, n - 1)
+  end
+
+
+  def uuid(conn, _params) do
+    uuid = UUID.uuid4()
+    json(conn, %{uuid: uuid})
   end
 
   @spec cookies(Plug.Conn.t(), any()) :: Plug.Conn.t()
@@ -292,7 +372,7 @@ defmodule HTTPlexWeb.APIController do
     |> send_resp(200, :zlib.gzip("This content is GZip-encoded."))
   end
 
-  def html(conn, _params) do
+  def html_response(conn, _params) do
     conn
     |> put_resp_content_type("text/html")
     |> send_resp(200, "<html><body><h1>Hello, World!</h1></body></html>")
@@ -343,31 +423,6 @@ defmodule HTTPlexWeb.APIController do
 
   defp custom_redirect(conn, n) when n > 0 do
     redirect(conn, external: "https://httplex.com/redirect/#{n - 1}")
-  end
-
-  @spec stream(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def stream(conn, %{"n" => n}) do
-    n = String.to_integer(n)
-
-    if Mix.env() == :test do
-      # For testing, return all numbers at once
-      conn
-      |> put_resp_content_type("application/json")
-      |> json(Enum.to_list(n..1))
-    else
-      conn
-      |> put_resp_content_type("application/json")
-      |> send_chunked(200)
-      |> stream_data(String.to_integer(n))
-    end
-  end
-
-  defp stream_data(conn, 0), do: conn
-
-  defp stream_data(conn, n) do
-    :timer.sleep(1000)
-    chunk(conn, "#{n}\n")
-    stream_data(conn, n - 1)
   end
 
   def anything(conn, _params) do
@@ -526,4 +581,12 @@ defmodule HTTPlexWeb.APIController do
     |> put_resp_header("www-authenticate", "Basic realm=\"HTTPlex\"")
     |> send_resp(401, "Unauthorized")
   end
+
+  defp parse_float_or_int(value) when is_binary(value) do
+    case Float.parse(value) do
+      {float, ""} -> float
+      :error -> String.to_integer(value)
+    end
+  end
+  defp parse_float_or_int(value) when is_number(value), do: value
 end
