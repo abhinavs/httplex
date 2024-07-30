@@ -363,4 +363,73 @@ defmodule HTTPlexWeb.APIControllerTest do
       assert response(conn, 401) == "Unauthorized"
     end
   end
+
+  describe "Caching" do
+    test "GET /cache - returns 304 with If-None-Match header", %{conn: conn} do
+      conn = get(conn, ~p"/cache")
+      etag = Enum.at(get_resp_header(conn, "etag"), 0)
+
+      conn =
+        conn
+        |> recycle()
+        |> put_req_header("if-none-match", etag)
+        |> get(~p"/cache")
+
+      assert response(conn, 304) == ""
+    end
+
+    test "GET /cache - returns 304 with If-Modified-Since header", %{conn: conn} do
+      conn = get(conn, ~p"/cache")
+      last_modified = Enum.at(get_resp_header(conn, "last-modified"), 0)
+
+      conn =
+        conn
+        |> recycle()
+        |> put_req_header("if-modified-since", last_modified)
+        |> get(~p"/cache")
+
+      assert response(conn, 304) == ""
+    end
+
+    test "GET /cache/:value - sets Cache-Control header", %{conn: conn} do
+      conn = get(conn, ~p"/cache/60")
+
+      assert Enum.at(get_resp_header(conn, "cache-control"), 0) == "public, max-age=60"
+      assert json_response(conn, 200) == %{"status" => "ok"}
+    end
+
+    test "GET /etag/:etag - returns 304 with matching If-None-Match", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("if-none-match", "test-etag")
+        |> get(~p"/etag/test-etag")
+
+      assert response(conn, 304) == ""
+    end
+
+    test "GET /etag/:etag - returns 412 with non-matching If-Match", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("if-match", "wrong-etag")
+        |> get(~p"/etag/test-etag")
+
+      assert response(conn, 412) == "Precondition Failed"
+    end
+  end
+
+  describe "Response Headers" do
+    test "GET /response-headers - sets custom headers", %{conn: conn} do
+      conn = get(conn, ~p"/response-headers?x-custom-header=test-value")
+
+      assert Enum.at(get_resp_header(conn, "x-custom-header"), 0) == "test-value"
+      assert json_response(conn, 200) == %{"x-custom-header" => "test-value"}
+    end
+
+    test "POST /response-headers - sets custom headers", %{conn: conn} do
+      conn = post(conn, ~p"/response-headers?x-custom-header=test-value")
+
+      assert Enum.at(get_resp_header(conn, "x-custom-header"), 0) == "test-value"
+      assert json_response(conn, 200) == %{"x-custom-header" => "test-value"}
+    end
+  end
 end

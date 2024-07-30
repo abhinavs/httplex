@@ -41,6 +41,14 @@
     {
       "name": "Auth",
       "description": "Authentication-related endpoints"
+    },
+    {
+      "name": "Caching",
+      "description": "Endpoints demonstrating caching mechanisms"
+    },
+    {
+      "name": "Response inspection",
+      "description": "Endpoints for inspecting response details"
     }
   ],
   "paths": {
@@ -48,6 +56,9 @@
       "get": {
         "summary": "Home",
         "description": "Returns the homepage.",
+        "tags": [
+          "Hello World"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -59,16 +70,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Hello World"
-        ]
+        }
       }
     },
     "/get": {
       "get": {
         "summary": "GET Request",
         "description": "Returns GET data.",
+        "tags": [
+          "HTTP Methods"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -80,16 +91,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "HTTP Methods"
-        ]
+        }
       }
     },
     "/post": {
       "post": {
         "summary": "POST Request",
         "description": "Returns POST data.",
+        "tags": [
+          "HTTP Methods"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -101,16 +112,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "HTTP Methods"
-        ]
+        }
       }
     },
     "/put": {
       "put": {
         "summary": "PUT Request",
         "description": "Returns PUT data.",
+        "tags": [
+          "HTTP Methods"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -122,16 +133,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "HTTP Methods"
-        ]
+        }
       }
     },
     "/patch": {
       "patch": {
         "summary": "PATCH Request",
         "description": "Returns PATCH data.",
+        "tags": [
+          "HTTP Methods"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -143,16 +154,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "HTTP Methods"
-        ]
+        }
       }
     },
     "/delete": {
       "delete": {
         "summary": "DELETE Request",
         "description": "Returns DELETE data.",
+        "tags": [
+          "HTTP Methods"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -164,16 +175,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "HTTP Methods"
-        ]
+        }
       }
     },
     "/status/{code}": {
       "get": {
         "summary": "Status Code",
         "description": "Returns a response with the specified status code.",
+        "tags": [
+          "Status codes"
+        ],
         "parameters": [
           {
             "name": "code",
@@ -188,16 +199,16 @@
           "default": {
             "description": "Response with specified status code"
           }
-        },
-        "tags": [
-          "Status codes"
-        ]
+        }
       }
     },
     "/ip": {
       "get": {
         "summary": "Client IP",
         "description": "Returns the client's IP address.",
+        "tags": [
+          "Request inspection"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -214,16 +225,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Request inspection"
-        ]
+        }
       }
     },
     "/user-agent": {
       "get": {
         "summary": "User Agent",
         "description": "Returns the user agent.",
+        "tags": [
+          "Request inspection"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -240,16 +251,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Request inspection"
-        ]
+        }
       }
     },
     "/headers": {
       "get": {
         "summary": "Headers",
         "description": "Returns the request headers.",
+        "tags": [
+          "Request inspection"
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -264,16 +275,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Request inspection"
-        ]
+        }
       }
     },
     "/delay/{n}": {
       "get": {
         "summary": "Delay Response",
         "description": "Delays the response for n seconds.",
+        "tags": [
+          "Dynamic data"
+        ],
         "parameters": [
           {
             "name": "n",
@@ -300,16 +311,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Dynamic data"
-        ]
+        }
       }
     },
     "/base64/{value}": {
       "get": {
         "summary": "Decode Base64",
         "description": "Decodes base64url-encoded string.",
+        "tags": [
+          "Dynamic data"
+        ],
         "parameters": [
           {
             "name": "value",
@@ -331,16 +342,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Dynamic data"
-        ]
+        }
       }
     },
     "/bytes/{n}": {
       "get": {
         "summary": "Random Bytes",
         "description": "Returns n random bytes generated with given seed.",
+        "tags": [
+          "Dynamic data"
+        ],
         "parameters": [
           {
             "name": "n",
@@ -363,16 +374,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Dynamic data"
-        ]
+        }
       }
     },
     "/cookies": {
       "get": {
         "summary": "Get Cookies",
         "description": "Returns cookie data.",
+        "tags": [
+          "Cookies"
+        ],
         "responses": {
           "200": {
             "description": "Cookie data",
@@ -384,16 +395,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Cookies"
-        ]
+        }
       }
     },
     "/cookies/set": {
       "get": {
         "summary": "Set Cookies",
         "description": "Sets one or more simple cookies.",
+        "tags": [
+          "Cookies"
+        ],
         "responses": {
           "200": {
             "description": "Cookie confirmation",
@@ -405,16 +416,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Cookies"
-        ]
+        }
       }
     },
     "/image": {
       "get": {
         "summary": "Get Image",
         "description": "Returns an image based on the Accept header.",
+        "tags": [
+          "Images"
+        ],
         "responses": {
           "200": {
             "description": "An image",
@@ -424,16 +435,16 @@
               "image/webp": {}
             }
           }
-        },
-        "tags": [
-          "Images"
-        ]
+        }
       }
     },
     "/image/png": {
       "get": {
         "summary": "PNG Image",
         "description": "Returns a PNG image.",
+        "tags": [
+          "Images"
+        ],
         "responses": {
           "200": {
             "description": "A PNG image",
@@ -446,16 +457,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Images"
-        ]
+        }
       }
     },
     "/image/jpeg": {
       "get": {
         "summary": "JPEG Image",
         "description": "Returns a JPEG image.",
+        "tags": [
+          "Images"
+        ],
         "responses": {
           "200": {
             "description": "A JPEG image",
@@ -468,16 +479,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Images"
-        ]
+        }
       }
     },
     "/image/webp": {
       "get": {
         "summary": "WebP Image",
         "description": "Returns a WebP image.",
+        "tags": [
+          "Images"
+        ],
         "responses": {
           "200": {
             "description": "A WebP image",
@@ -490,16 +501,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Images"
-        ]
+        }
       }
     },
     "/image/svg": {
       "get": {
         "summary": "SVG Image",
         "description": "Returns an SVG image.",
+        "tags": [
+          "Images"
+        ],
         "responses": {
           "200": {
             "description": "An SVG image",
@@ -511,16 +522,16 @@
               }
             }
           }
-        },
-        "tags": [
-          "Images"
-        ]
+        }
       }
     },
     "/redirect/{n}": {
       "get": {
         "summary": "Redirect n times",
         "description": "302 Redirects n times.",
+        "tags": [
+          "Redirects"
+        ],
         "parameters": [
           {
             "name": "n",
@@ -542,10 +553,7 @@
               }
             }
           }
-        },
-        "tags": [
-          "Redirects"
-        ]
+        }
       }
     },
     "/basic-auth/{user}/{passwd}": {
@@ -927,6 +935,194 @@
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/cache": {
+      "get": {
+        "summary": "Cache Control",
+        "description": "Returns a 304 if an If-Modified-Since header or If-None-Match is present. Returns the same as a GET otherwise.",
+        "tags": [
+          "Caching"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified"
+          }
+        }
+      }
+    },
+    "/cache/{value}": {
+      "get": {
+        "summary": "Cache Control with Max-Age",
+        "description": "Sets a Cache-Control header for n seconds.",
+        "tags": [
+          "Caching"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of seconds for cache control"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/etag/{etag}": {
+      "get": {
+        "summary": "ETag",
+        "description": "Assumes the resource has the given etag and responds to If-None-Match and If-Match headers appropriately.",
+        "tags": [
+          "Caching"
+        ],
+        "parameters": [
+          {
+            "name": "etag",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ETag value"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified"
+          },
+          "412": {
+            "description": "Precondition Failed"
+          }
+        }
+      }
+    },
+    "/response-headers": {
+      "get": {
+        "summary": "Response Headers",
+        "description": "Returns a set of response headers from the query string.",
+        "tags": [
+          "Response inspection"
+        ],
+        "parameters": [
+          {
+            "name": "freeform",
+            "in": "query",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Response Headers",
+        "description": "Returns a set of response headers from the query string.",
+        "tags": [
+          "Response inspection"
+        ],
+        "parameters": [
+          {
+            "name": "freeform",
+            "in": "query",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         }
       }

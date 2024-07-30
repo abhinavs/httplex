@@ -49,6 +49,58 @@ defmodule HTTPlexWeb.APIController do
     json(conn, request_info(conn))
   end
 
+  @spec cache(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  def cache(conn, _params) do
+    etag = "33a64df551425fcc55e4d42a148795d9f25f89d4"
+    last_modified = "Wed, 31 July 2024 07:28:00 GMT"
+
+    conn =
+      conn
+      |> put_resp_header("etag", etag)
+      |> put_resp_header("last-modified", last_modified)
+
+    case {get_req_header(conn, "if-none-match"), get_req_header(conn, "if-modified-since")} do
+      {[^etag], _} -> send_resp(conn, 304, "")
+      {_, [^last_modified]} -> send_resp(conn, 304, "")
+      _ -> json(conn, %{status: "ok"})
+    end
+  end
+
+  @spec cache_control(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def cache_control(conn, %{"value" => seconds}) do
+    {seconds, _} = Integer.parse(seconds)
+
+    conn
+    |> put_resp_header("cache-control", "public, max-age=#{seconds}")
+    |> json(%{status: "ok"})
+  end
+
+  @spec etag(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def etag(conn, %{"etag" => etag}) do
+    conn = put_resp_header(conn, "etag", etag)
+
+    case get_req_header(conn, "if-none-match") do
+      [^etag] ->
+        send_resp(conn, 304, "")
+
+      _ ->
+        case get_req_header(conn, "if-match") do
+          ["*"] -> json(conn, %{status: "ok"})
+          [^etag] -> json(conn, %{status: "ok"})
+          _ -> send_resp(conn, 412, "Precondition Failed")
+        end
+    end
+  end
+
+  def response_headers(conn, params) do
+    conn =
+      Enum.reduce(params, conn, fn {key, value}, acc ->
+        put_resp_header(acc, key, value)
+      end)
+
+    json(conn, params)
+  end
+
   @spec basic_auth(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def basic_auth(conn, %{"user" => user, "passwd" => passwd}) do
     case get_req_header(conn, "authorization") do
