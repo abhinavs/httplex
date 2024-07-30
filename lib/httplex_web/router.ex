@@ -61,6 +61,6 @@ defmodule HTTPlexWeb.Router do
     post "/forms/post", APIController, :forms_post
     get "/redirect/:n", APIController, :redirectx
     get "/stream/:n", APIController, :stream
-    # get "/*path", APIController, :anything
+    get "/*path", APIController, :anything
   end
 end

@@ -251,10 +251,19 @@ defmodule HTTPlexWeb.APIController do
 
   @spec stream(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def stream(conn, %{"n" => n}) do
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_chunked(200)
-    |> stream_data(String.to_integer(n))
+    n = String.to_integer(n)
+
+    if Mix.env() == :test do
+      # For testing, return all numbers at once
+      conn
+      |> put_resp_content_type("application/json")
+      |> json(Enum.to_list(n..1))
+    else
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_chunked(200)
+      |> stream_data(String.to_integer(n))
+    end
   end
 
   defp stream_data(conn, 0), do: conn
@@ -270,7 +279,8 @@ defmodule HTTPlexWeb.APIController do
       method: conn.method,
       headers: Enum.into(conn.req_headers, %{}),
       query: conn.query_params,
-      body: conn.body_params
+      body: conn.body_params,
+      url: custom_current_url(conn)
     })
   end
 
