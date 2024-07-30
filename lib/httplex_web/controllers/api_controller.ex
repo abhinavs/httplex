@@ -1,54 +1,66 @@
 defmodule HTTPlexWeb.APIController do
   use HTTPlexWeb, :controller
 
+  @spec index(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def index(conn, _params) do
-    json(conn, %{message: "Welcome to HTTP Plex!"})
+    json(conn, %{message: "Welcome to HTTPlex!"})
   end
 
+  @spec ip(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def ip(conn, _params) do
     json(conn, %{origin: to_string(:inet.ntoa(conn.remote_ip))})
   end
 
+  @spec user_agent(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def user_agent(conn, _params) do
     user_agent = get_req_header(conn, "user-agent") |> List.first()
     json(conn, %{"user-agent": user_agent})
   end
 
+  @spec headers(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def headers(conn, _params) do
     json(conn, %{headers: Map.new(conn.req_headers)})
   end
 
+  @spec get(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def get(conn, _params) do
     json(conn, request_info(conn))
   end
 
+  @spec post(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def post(conn, _params) do
     json(conn, request_info(conn))
   end
 
+  @spec put(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def put(conn, _params) do
     json(conn, request_info(conn))
   end
 
+  @spec patch(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def patch(conn, _params) do
     json(conn, request_info(conn))
   end
 
+  @spec delete(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def delete(conn, _params) do
     json(conn, request_info(conn))
   end
 
+  @spec status(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def status(conn, %{"code" => code}) do
     code = String.to_integer(code)
     send_resp(conn, code, "")
   end
 
+  @spec delay(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delay(conn, %{"n" => n}) do
     seconds = String.to_integer(n)
     :timer.sleep(seconds * 1000)
     json(conn, %{delay: seconds})
   end
 
+  @spec decode_base64(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def decode_base64(conn, %{"value" => value}) do
     case Base.url_decode64(value) do
       {:ok, decoded} -> text(conn, decoded)
@@ -56,6 +68,7 @@ defmodule HTTPlexWeb.APIController do
     end
   end
 
+  @spec random_bytes(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def random_bytes(conn, %{"n" => n}) do
     # 100KB limit
     n = String.to_integer(n) |> min(100 * 1024)
@@ -66,17 +79,20 @@ defmodule HTTPlexWeb.APIController do
     |> send_resp(200, data)
   end
 
+  @spec cookies(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def cookies(conn, _params) do
     cookies = conn.req_cookies
     json(conn, cookies)
   end
 
+  @spec set_cookies(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def set_cookies(conn, %{"name" => name, "value" => value}) do
     conn
     |> put_resp_cookie(name, value)
     |> json(%{message: "Cookie set!"})
   end
 
+  @spec image(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def image(conn, %{"format" => format}) do
     image_path =
       case format do
@@ -98,6 +114,7 @@ defmodule HTTPlexWeb.APIController do
     |> send_file(200, "priv/static/images/sample.png")
   end
 
+  @spec json_response(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def json_response(conn, _params) do
     json(conn, %{
       project: %{
@@ -148,6 +165,7 @@ defmodule HTTPlexWeb.APIController do
     })
   end
 
+  @spec xml_response(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def xml_response(conn, _params) do
     xml_data = """
     <?xml version="1.0" encoding="UTF-8" ?>
@@ -212,20 +230,26 @@ defmodule HTTPlexWeb.APIController do
     |> send_resp(200, xml_data)
   end
 
+  @spec forms_post(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def forms_post(conn, _params) do
     json(conn, conn.body_params)
   end
 
+  @spec redirectx(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def redirectx(conn, %{"n" => n}) do
     n = String.to_integer(n)
-
-    if n > 0 do
-      redirect(conn, external: "https://httplex.com/redirect/#{n - 1}")
-    else
-      json(conn, %{message: "Reached final redirect", n: n})
-    end
+    custom_redirect(conn, n)
   end
 
+  defp custom_redirect(conn, 0) do
+    json(conn, %{message: "Reached final redirect", n: 0})
+  end
+
+  defp custom_redirect(conn, n) when n > 0 do
+    redirect(conn, external: "https://httplex.com/redirect/#{n - 1}")
+  end
+
+  @spec stream(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def stream(conn, %{"n" => n}) do
     conn
     |> put_resp_content_type("application/json")

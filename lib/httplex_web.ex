@@ -18,7 +18,7 @@ defmodule HTTPlexWeb do
   """
 
   def static_paths,
-    do: ~w(assets fonts images favicon.ico robots.txt httplex_openapi.yaml)
+    do: ~w(assets fonts images favicon.ico robots.txt httplex_openapi.yaml httplex_openapi.json)
 
   def router do
     quote do

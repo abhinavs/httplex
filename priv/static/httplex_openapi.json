@@ -1,0 +1,545 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "HTTPlex API",
+    "version": "1.0.0",
+    "description": "A simple HTTP Request & Response Service."
+  },
+  "paths": {
+    "/hello": {
+      "get": {
+        "summary": "Home",
+        "description": "Returns the homepage.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Response formats"
+        ]
+      }
+    },
+    "/get": {
+      "get": {
+        "summary": "GET Request",
+        "description": "Returns GET data.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "HTTP Methods"
+        ]
+      }
+    },
+    "/post": {
+      "post": {
+        "summary": "POST Request",
+        "description": "Returns POST data.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "HTTP Methods"
+        ]
+      }
+    },
+    "/put": {
+      "put": {
+        "summary": "PUT Request",
+        "description": "Returns PUT data.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "HTTP Methods"
+        ]
+      }
+    },
+    "/patch": {
+      "patch": {
+        "summary": "PATCH Request",
+        "description": "Returns PATCH data.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "HTTP Methods"
+        ]
+      }
+    },
+    "/delete": {
+      "delete": {
+        "summary": "DELETE Request",
+        "description": "Returns DELETE data.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "HTTP Methods"
+        ]
+      }
+    },
+    "/status/{code}": {
+      "get": {
+        "summary": "Status Code",
+        "description": "Returns a response with the specified status code.",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response with specified status code"
+          }
+        },
+        "tags": [
+          "Status codes"
+        ]
+      }
+    },
+    "/ip": {
+      "get": {
+        "summary": "Client IP",
+        "description": "Returns the client's IP address.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "origin": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Request inspection"
+        ]
+      }
+    },
+    "/user-agent": {
+      "get": {
+        "summary": "User Agent",
+        "description": "Returns the user agent.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user-agent": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Request inspection"
+        ]
+      }
+    },
+    "/headers": {
+      "get": {
+        "summary": "Headers",
+        "description": "Returns the request headers.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Request inspection"
+        ]
+      }
+    },
+    "/delay/{n}": {
+      "get": {
+        "summary": "Delay Response",
+        "description": "Delays the response for n seconds.",
+        "parameters": [
+          {
+            "name": "n",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delayed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "delay": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Dynamic data"
+        ]
+      }
+    },
+    "/base64/{value}": {
+      "get": {
+        "summary": "Decode Base64",
+        "description": "Decodes base64url-encoded string.",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Decoded data",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Dynamic data"
+        ]
+      }
+    },
+    "/bytes/{n}": {
+      "get": {
+        "summary": "Random Bytes",
+        "description": "Returns n random bytes generated with given seed.",
+        "parameters": [
+          {
+            "name": "n",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Random bytes",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Dynamic data"
+        ]
+      }
+    },
+    "/cookies": {
+      "get": {
+        "summary": "Get Cookies",
+        "description": "Returns cookie data.",
+        "responses": {
+          "200": {
+            "description": "Cookie data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cookies"
+        ]
+      }
+    },
+    "/cookies/set": {
+      "get": {
+        "summary": "Set Cookies",
+        "description": "Sets one or more simple cookies.",
+        "responses": {
+          "200": {
+            "description": "Cookie confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cookies"
+        ]
+      }
+    },
+    "/image": {
+      "get": {
+        "summary": "Get Image",
+        "description": "Returns an image based on the Accept header.",
+        "responses": {
+          "200": {
+            "description": "An image",
+            "content": {
+              "image/png": {},
+              "image/jpeg": {},
+              "image/webp": {}
+            }
+          }
+        },
+        "tags": [
+          "Images"
+        ]
+      }
+    },
+    "/image/png": {
+      "get": {
+        "summary": "PNG Image",
+        "description": "Returns a PNG image.",
+        "responses": {
+          "200": {
+            "description": "A PNG image",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Images"
+        ]
+      }
+    },
+    "/image/jpeg": {
+      "get": {
+        "summary": "JPEG Image",
+        "description": "Returns a JPEG image.",
+        "responses": {
+          "200": {
+            "description": "A JPEG image",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Images"
+        ]
+      }
+    },
+    "/image/webp": {
+      "get": {
+        "summary": "WebP Image",
+        "description": "Returns a WebP image.",
+        "responses": {
+          "200": {
+            "description": "A WebP image",
+            "content": {
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Images"
+        ]
+      }
+    },
+    "/image/svg": {
+      "get": {
+        "summary": "SVG Image",
+        "description": "Returns an SVG image.",
+        "responses": {
+          "200": {
+            "description": "An SVG image",
+            "content": {
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Images"
+        ]
+      }
+    },
+    "/redirect/{n}": {
+      "get": {
+        "summary": "Redirect n times",
+        "description": "302 Redirects n times.",
+        "parameters": [
+          {
+            "name": "n",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "A redirection.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Redirects"
+        ]
+      }
+    },
+    "/{anything}": {
+      "get": {
+        "summary": "Anything",
+        "description": "Returns anything passed in request data.",
+        "parameters": [
+          {
+            "name": "anything",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Anything passed in the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Anything"
+        ]
+      }
+    }
+  }
+}
