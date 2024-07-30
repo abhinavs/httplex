@@ -49,6 +49,14 @@
     {
       "name": "Response inspection",
       "description": "Endpoints for inspecting response details"
+    },
+    {
+      "name": "Response formats",
+      "description": "Endpoints returning responses in different formats"
+    },
+    {
+      "name": "Encoding",
+      "description": "Endpoints demonstrating various encoding methods"
     }
   ],
   "paths": {
@@ -516,6 +524,230 @@
             "description": "An SVG image",
             "content": {
               "image/svg+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/brotli": {
+      "get": {
+        "summary": "Brotli-encoded Response",
+        "description": "Returns Brotli-encoded data.",
+        "tags": [
+          "Encoding"
+        ],
+        "responses": {
+          "200": {
+            "description": "Brotli-encoded response",
+            "headers": {
+              "Content-Encoding": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "br"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deflate": {
+      "get": {
+        "summary": "Deflate-encoded Response",
+        "description": "Returns Deflate-encoded data.",
+        "tags": [
+          "Encoding"
+        ],
+        "responses": {
+          "200": {
+            "description": "Deflate-encoded response",
+            "headers": {
+              "Content-Encoding": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "deflate"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deny": {
+      "get": {
+        "summary": "Denied by robots.txt",
+        "description": "Returns page denied by robots.txt rules.",
+        "tags": [
+          "Response inspection"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/encoding/utf8": {
+      "get": {
+        "summary": "UTF-8 Encoded Response",
+        "description": "Returns a UTF-8 encoded body.",
+        "tags": [
+          "Encoding"
+        ],
+        "responses": {
+          "200": {
+            "description": "UTF-8 encoded response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gzip": {
+      "get": {
+        "summary": "GZip-encoded Response",
+        "description": "Returns GZip-encoded data.",
+        "tags": [
+          "Encoding"
+        ],
+        "responses": {
+          "200": {
+            "description": "GZip-encoded response",
+            "headers": {
+              "Content-Encoding": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "gzip"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/html": {
+      "get": {
+        "summary": "HTML Response",
+        "description": "Returns a simple HTML document.",
+        "tags": [
+          "Response formats"
+        ],
+        "responses": {
+          "200": {
+            "description": "HTML response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/json": {
+      "get": {
+        "summary": "JSON Response",
+        "description": "Returns a simple JSON document.",
+        "tags": [
+          "Response formats"
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/robots.txt": {
+      "get": {
+        "summary": "Robots.txt",
+        "description": "Returns some robots.txt rules.",
+        "tags": [
+          "Response inspection"
+        ],
+        "responses": {
+          "200": {
+            "description": "Robots.txt content",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/xml": {
+      "get": {
+        "summary": "XML Response",
+        "description": "Returns a simple XML document.",
+        "tags": [
+          "Response formats"
+        ],
+        "responses": {
+          "200": {
+            "description": "XML response",
+            "content": {
+              "application/xml": {
                 "schema": {
                   "type": "string"
                 }

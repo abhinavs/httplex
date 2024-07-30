@@ -56,7 +56,7 @@ defmodule HTTPlex.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
       {:cors_plug, "~> 3.0"},
-      {:rename_project, "~> 0.1.0", only: :dev}
+      {:brotli, "~> 0.3.0"}
     ]
   end
 

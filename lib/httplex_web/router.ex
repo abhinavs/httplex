@@ -67,8 +67,15 @@ defmodule HTTPlexWeb.Router do
     post "/cookies/set", APIController, :set_cookies
     get "/image/:format", APIController, :image
     get "/image", APIController, :image
+    get "/brotli", APIController, :brotli
+    get "/deflate", APIController, :deflate
+    get "/deny", APIController, :deny
+    get "/encoding/utf8", APIController, :encoding_utf8
+    get "/gzip", APIController, :gzip
+    get "/html", APIController, :html
     get "/json", APIController, :json_response
-    get "/xml", APIController, :xml_response
+    get "/robots.txt", APIController, :robots_txt
+    get "/xml", APIController, :xml
     post "/forms/post", APIController, :forms_post
     get "/redirect/:n", APIController, :redirectx
     get "/stream/:n", APIController, :stream

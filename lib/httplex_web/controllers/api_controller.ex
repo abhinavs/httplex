@@ -258,120 +258,72 @@ defmodule HTTPlexWeb.APIController do
     |> send_file(200, "priv/static/images/sample.png")
   end
 
-  @spec json_response(Plug.Conn.t(), any()) :: Plug.Conn.t()
-  def json_response(conn, _params) do
-    json(conn, %{
-      project: %{
-        name: "Example Project",
-        description: "This is an example project JSON structure",
-        created_at: "2024-07-28",
-        team: [
-          %{
-            name: "Alice",
-            role: "Project Manager",
-            contact: "alice@example.com"
-          },
-          %{
-            name: "Bob",
-            role: "Lead Developer",
-            contact: "bob@example.com"
-          },
-          %{
-            name: "Charlie",
-            role: "Designer",
-            contact: "charlie@example.com"
-          }
-        ],
-        tasks: [
-          %{
-            title: "Initial Planning",
-            status: "Completed",
-            due_date: "2024-06-15"
-          },
-          %{
-            title: "Development",
-            status: "In Progress",
-            due_date: "2024-08-01",
-            subtasks: [
-              %{title: "Set up project repository", status: "Completed"},
-              %{title: "Implement authentication", status: "In Progress"},
-              %{title: "Create API endpoints", status: "Pending"}
-            ]
-          },
-          %{
-            title: "Design",
-            status: "Pending",
-            due_date: "2024-08-10",
-            notes: "Coordinate with Charlie for the design assets"
-          }
-        ]
-      }
-    })
+  def brotli(conn, _params) do
+    {:ok, encoded_data} = :brotli.encode("This content is Brotli-encoded.")
+    conn
+    |> put_resp_content_type("text/plain")
+    |> put_resp_header("content-encoding", "br")
+    |> send_resp(200, encoded_data)
   end
 
-  @spec xml_response(Plug.Conn.t(), any()) :: Plug.Conn.t()
-  def xml_response(conn, _params) do
-    xml_data = """
-    <?xml version="1.0" encoding="UTF-8" ?>
-    <project>
-      <name>Example Project</name>
-      <description>This is an example project XML structure</description>
-      <created_at>2024-07-28</created_at>
-      <team>
-        <member>
-          <name>Alice</name>
-          <role>Project Manager</role>
-          <contact>alice@example.com</contact>
-        </member>
-        <member>
-          <name>Bob</name>
-          <role>Lead Developer</role>
-          <contact>bob@example.com</contact>
-        </member>
-        <member>
-          <name>Charlie</name>
-          <role>Designer</role>
-          <contact>charlie@example.com</contact>
-        </member>
-      </team>
-      <tasks>
-        <task>
-          <title>Initial Planning</title>
-          <status>Completed</status>
-          <due_date>2024-06-15</due_date>
-        </task>
-        <task>
-          <title>Development</title>
-          <status>In Progress</status>
-          <due_date>2024-08-01</due_date>
-          <subtasks>
-            <subtask>
-              <title>Set up project repository</title>
-              <status>Completed</status>
-            </subtask>
-            <subtask>
-              <title>Implement authentication</title>
-              <status>In Progress</status>
-            </subtask>
-            <subtask>
-              <title>Create API endpoints</title>
-              <status>Pending</status>
-            </subtask>
-          </subtasks>
-        </task>
-        <task>
-          <title>Design</title>
-          <status>Pending</status>
-          <due_date>2024-08-10</due_date>
-          <notes>Coordinate with Charlie for the design assets</notes>
-        </task>
-      </tasks>
-    </project>
-    """
+  def deflate(conn, _params) do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> put_resp_header("content-encoding", "deflate")
+    |> send_resp(200, :zlib.compress("This content is Deflate-encoded."))
+  end
 
+  def deny(conn, _params) do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, "You've been denied access by robots.txt.")
+  end
+
+  def encoding_utf8(conn, _params) do
+    conn
+    |> put_resp_content_type("text/plain", "utf-8")
+    |> send_resp(200, "नमस्ते दुनिया")
+  end
+
+  def gzip(conn, _params) do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> put_resp_header("content-encoding", "gzip")
+    |> send_resp(200, :zlib.gzip("This content is GZip-encoded."))
+  end
+
+  def html(conn, _params) do
+    conn
+    |> put_resp_content_type("text/html")
+    |> send_resp(200, "<html><body><h1>Hello, World!</h1></body></html>")
+  end
+
+  @spec json_response(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  def json_response(conn, _params) do
+    json(conn, %{message: "This is a JSON response"})
+  end
+
+  def robots_txt(conn, _params) do
+    content = """
+    # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+    #
+    # To ban all spiders from the entire site uncomment the next two lines:
+    # User-agent: *
+    # Disallow: /
+    """
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, String.trim(content))
+  end
+
+  @spec xml(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  def xml(conn, _params) do
     conn
     |> put_resp_content_type("application/xml")
-    |> send_resp(200, xml_data)
+    |> send_resp(
+      200,
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><message>This is an XML response</message></root>"
+    )
   end
 
   @spec forms_post(Plug.Conn.t(), any()) :: Plug.Conn.t()

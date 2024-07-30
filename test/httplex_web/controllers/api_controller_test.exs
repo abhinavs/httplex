@@ -229,15 +229,23 @@ defmodule HTTPlexWeb.APIControllerTest do
   end
 
   describe "Response formats" do
-    test "GET /json", %{conn: conn} do
-      conn = get(conn, ~p"/json")
-      assert %{"project" => _} = json_response(conn, 200)
+    test "GET /html returns HTML content", %{conn: conn} do
+      conn = get(conn, ~p"/html")
+      assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
+      assert response(conn, 200) == "<html><body><h1>Hello, World!</h1></body></html>"
     end
 
-    test "GET /xml", %{conn: conn} do
+    test "GET /json returns JSON content", %{conn: conn} do
+      conn = get(conn, ~p"/json")
+      assert json_response(conn, 200) == %{"message" => "This is a JSON response"}
+    end
+
+    test "GET /xml returns XML content", %{conn: conn} do
       conn = get(conn, ~p"/xml")
-      assert response_content_type(conn, :xml)
-      assert response(conn, 200) =~ "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+      assert get_resp_header(conn, "content-type") == ["application/xml; charset=utf-8"]
+
+      assert response(conn, 200) ==
+               "<?xml version=\"1.0\" encoding=\"UTF-8\"?><root><message>This is an XML response</message></root>"
     end
   end
 
@@ -432,4 +440,51 @@ defmodule HTTPlexWeb.APIControllerTest do
       assert json_response(conn, 200) == %{"x-custom-header" => "test-value"}
     end
   end
+
+  describe "Encoding" do
+    test "GET /brotli returns Brotli-encoded data", %{conn: conn} do
+      conn = get(conn, ~p"/brotli")
+      assert get_resp_header(conn, "content-encoding") == ["br"]
+      {:ok, expected_data} = :brotli.encode("This content is Brotli-encoded.")
+      assert response(conn, 200) == expected_data
+    end
+
+    test "GET /deflate returns Deflate-encoded data", %{conn: conn} do
+      conn = get(conn, ~p"/deflate")
+      assert get_resp_header(conn, "content-encoding") == ["deflate"]
+      assert response(conn, 200) == :zlib.compress("This content is Deflate-encoded.")
+    end
+
+    test "GET /encoding/utf8 returns UTF-8 encoded data", %{conn: conn} do
+      conn = get(conn, ~p"/encoding/utf8")
+      assert get_resp_header(conn, "content-type") == ["text/plain; charset=utf-8"]
+      assert response(conn, 200) == "नमस्ते दुनिया"
+    end
+
+    test "GET /gzip returns GZip-encoded data", %{conn: conn} do
+      conn = get(conn, ~p"/gzip")
+      assert get_resp_header(conn, "content-encoding") == ["gzip"]
+      assert response(conn, 200) == :zlib.gzip("This content is GZip-encoded.")
+    end
+  end
+
+  describe "Response inspection" do
+    test "GET /deny returns denied message", %{conn: conn} do
+      conn = get(conn, ~p"/deny")
+      assert response(conn, 200) == "You've been denied access by robots.txt."
+    end
+
+    test "GET /robots.txt returns robots.txt content", %{conn: conn} do
+      conn = get(conn, ~p"/robots.txt")
+      expected_content = """
+      # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+      #
+      # To ban all spiders from the entire site uncomment the next two lines:
+      # User-agent: *
+      # Disallow: /
+      """
+      assert String.trim(response(conn, 200)) == String.trim(expected_content)
+    end
+  end
+
 end
