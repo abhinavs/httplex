@@ -242,7 +242,7 @@ defmodule HTTPlexWeb.APIController do
   end
 
   defp custom_redirect(conn, 0) do
-    json(conn, %{message: "Reached final redirect", n: 0})
+    json(conn, %{message: "Redirect completed"})
   end
 
   defp custom_redirect(conn, n) when n > 0 do
