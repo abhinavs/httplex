@@ -88,6 +88,8 @@ defmodule HTTPlexWeb.Router do
     get "/xml", APIController, :xml
     post "/forms/post", APIController, :forms_post
     get "/redirect/:n", APIController, :redirectx
-    get "/*path", APIController, :anything
+    match :*, "/anything", APIController, :anything
+    match :*, "/anything/*anything", APIController, :anything
   end
+
 end

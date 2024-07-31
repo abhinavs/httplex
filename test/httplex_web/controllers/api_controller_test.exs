@@ -350,14 +350,68 @@ defmodule HTTPlexWeb.APIControllerTest do
   end
 
   describe "Catch-all route" do
-    test "GET /*anything", %{conn: conn} do
-      conn = get(conn, ~p"/anything/test")
+    test "GET /anything with query params" do
+      conn =
+        :get
+        |> Plug.Test.conn("/anything?key=value")
+        |> HTTPlexWeb.Router.call([])
+
       response = json_response(conn, 200)
       assert response["method"] == "GET"
-      assert is_map(response["headers"])
-      assert is_map(response["body"])
-      assert is_map(response["query"])
-      assert String.contains?(response["url"], "/anything/test")
+      assert response["args"] == %{"key" => "value"}
+      assert response["data"] == ""
+    end
+
+    test "POST /anything with JSON body" do
+      body = Jason.encode!(%{key: "value"})
+      conn =
+        :post
+        |> Plug.Test.conn("/anything", body)
+        |> Plug.Conn.put_req_header("content-type", "application/json")
+        |> HTTPlexWeb.Router.call([])
+
+      response = json_response(conn, 200)
+      assert response["method"] == "POST"
+      assert response["json"] == %{"key" => "value"}
+      assert response["data"] == body
+    end
+
+    test "PATCH /anything with form data" do
+      body = "key=value"
+      conn =
+        :patch
+        |> Plug.Test.conn("/anything", body)
+        |> Plug.Conn.put_req_header("content-type", "application/x-www-form-urlencoded")
+        |> HTTPlexWeb.Router.call([])
+
+      response = json_response(conn, 200)
+      assert response["method"] == "PATCH"
+      assert response["form"] == %{"key" => "value"}
+      assert response["data"] == body
+    end
+
+    test "PUT /anything/{anything}" do
+      conn =
+        :put
+        |> Plug.Test.conn("/anything/test")
+        |> HTTPlexWeb.Router.call([])
+
+      response = json_response(conn, 200)
+      assert response["method"] == "PUT"
+      assert response["url"] =~ "/anything/test"
+      assert response["data"] == ""
+    end
+
+    test "DELETE /anything/{anything}" do
+      conn =
+        :delete
+        |> Plug.Test.conn("/anything/test")
+        |> HTTPlexWeb.Router.call([])
+
+      response = json_response(conn, 200)
+      assert response["method"] == "DELETE"
+      assert response["url"] =~ "/anything/test"
+      assert response["data"] == ""
     end
   end
 

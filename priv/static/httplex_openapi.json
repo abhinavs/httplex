@@ -57,6 +57,10 @@
     {
       "name": "Encoding",
       "description": "Endpoints demonstrating various encoding methods"
+    },
+    {
+      "name": "Anything",
+      "description": "Endpoints that return anything passed in the request"
     }
   ],
   "paths": {
@@ -1552,6 +1556,126 @@
             }
           }
         }
+      }
+    },
+    "/anything": {
+      "get": {
+        "summary": "Anything",
+        "description": "Returns anything passed in request data.",
+        "tags": [
+          "Anything"
+        ],
+        "responses": {
+          "200": {
+            "description": "Anything passed in request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "headers": {
+                      "type": "object"
+                    },
+                    "args": {
+                      "type": "object"
+                    },
+                    "data": {
+                      "type": "string"
+                    },
+                    "form": {
+                      "type": "object"
+                    },
+                    "json": {
+                      "type": "object"
+                    },
+                    "params": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "$ref": "#/paths/~1anything/get",
+        "tags": [
+          "Anything"
+        ],
+      },
+      "put": {
+        "$ref": "#/paths/~1anything/get",
+        "tags": [
+          "Anything"
+        ],
+      },
+      "patch": {
+        "$ref": "#/paths/~1anything/get",
+        "tags": [
+          "Anything"
+        ],
+      },
+      "delete": {
+        "$ref": "#/paths/~1anything/get",
+        "tags": [
+          "Anything"
+        ],
+      }
+    },
+    "/anything/{anything}": {
+      "get": {
+        "summary": "Anything with path",
+        "description": "Returns anything passed in request data, including the path.",
+        "tags": [
+          "Anything"
+        ],
+        "parameters": [
+          {
+            "name": "anything",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Any path segment"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1anything/get/responses/200"
+          }
+        }
+      },
+      "post": {
+        "$ref": "#/paths/~1anything~1{anything}/get",
+        "tags": [
+          "Anything"
+        ],
+      },
+      "put": {
+        "$ref": "#/paths/~1anything~1{anything}/get",
+        "tags": [
+          "Anything"
+        ],
+      },
+      "patch": {
+        "$ref": "#/paths/~1anything~1{anything}/get",
+        "tags": [
+          "Anything"
+        ],
+      },
+      "delete": {
+        "$ref": "#/paths/~1anything~1{anything}/get",
+        "tags": [
+          "Anything"
+        ],
       }
     }
   },

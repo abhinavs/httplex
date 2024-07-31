@@ -425,14 +425,37 @@ defmodule HTTPlexWeb.APIController do
     redirect(conn, external: "https://httplex.com/redirect/#{n - 1}")
   end
 
-  def anything(conn, _params) do
-    json(conn, %{
+  def anything(conn, params) do
+    {:ok, body, conn} = Plug.Conn.read_body(conn)
+
+    content_type = get_req_header(conn, "content-type") |> List.first()
+
+    {data, json_data, form_data} = case content_type do
+      "application/json" <> _ ->
+        json_data = if body != "", do: Jason.decode!(body), else: %{}
+        {body, json_data, %{}}
+      "application/x-www-form-urlencoded" <> _ ->
+        form_data = if body != "", do: Plug.Conn.Query.decode(body), else: %{}
+        {body, nil, form_data}
+      _ ->
+        {body, nil, %{}}
+    end
+
+    # Ensure query_params are fetched
+    conn = fetch_query_params(conn)
+
+    response = %{
       method: conn.method,
-      headers: Enum.into(conn.req_headers, %{}),
-      query: conn.query_params,
-      body: conn.body_params,
-      url: custom_current_url(conn)
-    })
+      url: custom_current_url(conn),
+      headers: conn.req_headers |> Enum.into(%{}),
+      args: conn.query_params,
+      data: data,
+      form: form_data,
+      json: json_data,
+      params: params
+    }
+
+    json(conn, response)
   end
 
   defp request_info(conn) do
@@ -451,6 +474,7 @@ defmodule HTTPlexWeb.APIController do
   defp custom_read_body(conn) do
     case Plug.Conn.read_body(conn) do
       {:ok, body, _conn} -> body
+      {:more, body, _conn} -> body
       _ -> ""
     end
   end
@@ -463,23 +487,9 @@ defmodule HTTPlexWeb.APIController do
   end
 
   defp custom_current_url(conn) do
-    scheme = conn.scheme
-    host = conn.host
-    port = conn.port
-    request_path = conn.request_path
-    query_string = conn.query_string
-
-    url = "#{scheme}://#{host}"
-
-    url =
-      if (scheme == :https and port != 443) or (scheme == :http and port != 80) do
-        "#{url}:#{port}"
-      else
-        url
-      end
-
-    url = "#{url}#{request_path}"
-    if query_string != "", do: "#{url}?#{query_string}", else: url
+    conn = fetch_query_params(conn)
+    query_string = if conn.query_string != "", do: "?#{conn.query_string}", else: ""
+    "#{conn.scheme}://#{conn.host}#{conn.request_path}#{query_string}"
   end
 
   defp format_ip(ip) do
