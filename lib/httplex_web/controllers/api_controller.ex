@@ -411,18 +411,42 @@ defmodule HTTPlexWeb.APIController do
     json(conn, conn.body_params)
   end
 
+   @spec absolute_redirect(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def absolute_redirect(conn, %{"n" => n}) do
+    n = String.to_integer(n)
+    if n > 0 do
+      redirect(conn, external: "#{custom_current_url(conn)}/absolute-redirect/#{n - 1}")
+    else
+      json(conn, %{message: "Redirect completed"})
+    end
+  end
+
+  @spec redirect_to(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def redirect_to(conn, %{"url" => url} = params) do
+    status = Map.get(params, "status_code", "302") |> String.to_integer()
+    conn
+    |> put_status(status)
+    |> redirect(external: url)
+  end
+
   @spec redirectx(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def redirectx(conn, %{"n" => n}) do
     n = String.to_integer(n)
-    custom_redirect(conn, n)
+    if n > 0 do
+      redirect(conn, to: "/redirect/#{n - 1}")
+    else
+      json(conn, %{message: "Redirect completed"})
+    end
   end
 
-  defp custom_redirect(conn, 0) do
-    json(conn, %{message: "Redirect completed"})
-  end
-
-  defp custom_redirect(conn, n) when n > 0 do
-    redirect(conn, external: "https://httplex.com/redirect/#{n - 1}")
+  @spec relative_redirect(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def relative_redirect(conn, %{"n" => n}) do
+    n = String.to_integer(n)
+    if n > 0 do
+      redirect(conn, to: "/relative-redirect/#{n - 1}")
+    else
+      json(conn, %{message: "Redirect completed"})
+    end
   end
 
   def anything(conn, params) do
@@ -599,4 +623,6 @@ defmodule HTTPlexWeb.APIController do
     end
   end
   defp parse_float_or_int(value) when is_number(value), do: value
+
+
 end

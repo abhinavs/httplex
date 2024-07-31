@@ -337,15 +337,35 @@ defmodule HTTPlexWeb.APIControllerTest do
     end
   end
 
-  describe "Redirects" do
+  describe "Redirect routes" do
     test "GET /redirect/:n redirects for n > 0", %{conn: conn} do
       conn = get(conn, ~p"/redirect/3")
-      assert redirected_to(conn, 302) == "https://httplex.com/redirect/2"
+      assert redirected_to(conn, 302) == "/redirect/2"
     end
 
     test "GET /redirect/:n stops redirecting when n = 0", %{conn: conn} do
       conn = get(conn, ~p"/redirect/0")
       assert json_response(conn, 200) == %{"message" => "Redirect completed"}
+    end
+
+    test "GET /absolute-redirect/:n", %{conn: conn} do
+      conn = get(conn, ~p"/absolute-redirect/3")
+      assert redirected_to(conn, 302) =~ "/absolute-redirect/2"
+    end
+
+    test "GET /relative-redirect/:n", %{conn: conn} do
+      conn = get(conn, ~p"/relative-redirect/3")
+      assert redirected_to(conn, 302) == "/relative-redirect/2"
+    end
+
+    test "GET /redirect-to", %{conn: conn} do
+      conn = get(conn, ~p"/redirect-to", url: "https://example.com")
+      assert redirected_to(conn, 302) == "https://example.com"
+    end
+
+    test "POST /redirect-to with custom status", %{conn: conn} do
+      conn = post(conn, ~p"/redirect-to", url: "https://example.com", status_code: "307")
+      assert redirected_to(conn, 307) == "https://example.com"
     end
   end
 
