@@ -3,28 +3,73 @@
 HTTPlex is an Elixir-based web service that provides a simple HTTP request and response service. It is inspired from [httpbin](https://httpbin.org/) and helps developers test and debug HTTP requests.
 
 ## Features
+The project is built using Elixir and the Phoenix framework. It defines a controller (`HTTPlexWeb.APIController`) that handles various HTTP endpoints:
 
-The project is built using Elixir and the Phoenix framework. It defines a controller (`HTTPlexWeb.APIController`) that handles various HTTP endpoints. Each function in the controller corresponds to a different feature:
+HTTP Methods:
+- `index/2`: Welcome message
+- `get/2`, `post/2`, `put/2`, `patch/2`, `delete/2`: Return request info for respective HTTP methods
+- `anything/2`: Accepts and returns data for any HTTP method
 
-- `index/2`: Welcomes users to HTTPlex.
-- `ip/2`: Retrieves and returns the client's IP address.
-- `user_agent/2`: Extracts and returns the User-Agent header.
-- `headers/2`: Collects and returns all request headers.
-- `get/2`, `post/2`, `put/2`, `patch/2`, `delete/2`: Handles different HTTP methods and returns comprehensive request information.
-- `status/2`: Responds with a custom status code.
-- `delay/2`: Introduces a specified delay before responding.
-- `base64/2`: Decodes Base64 URL-encoded strings.
-- `bytes/2`: Generates random bytes.
-- `cookies/2`: Returns the cookies sent with the request.
-- `cookies_set/2`: Sets a cookie with the provided name and value.
-- `image/2`: Returns an image in the specified format (`png`, `jpeg`, `webp`, `svg`).
-- `json/2`: Returns a sample JSON document.
-- `xml/2`: Returns a sample XML document.
-- `forms_post/2`: Returns form data sent in a POST request.
-- `redirect/2`: Redirects to a different URL `n` times.
-- `stream/2`: Streams data incrementally `n` times.
+Request Inspection:
+- `ip/2`: Returns the client's IP address
+- `user_agent/2`: Returns the user-agent header
+- `headers/2`: Returns all request headers
 
-The `request_info/1` helper function collects detailed information about the request, including method, URL, headers, parameters, and body data.
+Response Inspection:
+- `response_headers/2`: Sets custom response headers
+
+Auth:
+- `basic_auth/2`, `hidden_basic_auth/2`: Test Basic Authentication (hidden version doesn't send WWW-Authenticate header)
+- `bearer/2`: Tests Bearer Token Authentication
+- `digest_auth/2`: Tests Digest Authentication
+
+Status codes:
+- `status/2`: Returns response with specified status code
+
+Request formats:
+- `forms_post/2`: Handles form data submission
+
+Response formats:
+- `html_response/2`: Returns an HTML response
+- `json_response/2`: Returns a JSON response
+- `xml/2`: Returns an XML response
+- `image/2`: Returns an image in specified format
+
+Redirects:
+- `absolute_redirect/2`: Performs absolute redirects
+- `redirect_to/2`: Redirects to specified URL
+- `redirectx/2`: Performs multiple redirects
+- `relative_redirect/2`: Performs relative redirects
+
+Dynamic data:
+- `uuid/2`: Generates and returns a UUID
+- `random_bytes/2`: Returns random bytes
+- `deny/2`: Simulates denied access by robots.txt
+- `robots_txt/2`: Returns a sample robots.txt file
+- `delay/2`: Delays the response for specified seconds
+- `drip/2`: Drips data over a duration
+- `links/2`: Returns page containing n links
+- `range/2`: Streams n bytes with Accept-Ranges and Content-Range headers
+- `stream_bytes/2`: Streams n bytes of data
+- `stream_json/2`: Streams JSON data
+
+Cookies:
+- `get_cookies/2`: Returns all cookies sent with the request
+- `set_cookies/2`, `set_cookie/2`: Set multiple or a single cookie
+- `delete_cookies/2`: Deletes specified cookies
+
+Encoding:
+- `brotli/2`: Returns Brotli-encoded data
+- `deflate/2`: Returns Deflate-encoded data
+- `gzip/2`: Returns GZip-encoded data
+- `encoding_utf8/2`: Returns UTF-8 encoded text
+
+Caching:
+- `cache/2`: Tests caching headers
+- `cache_control/2`: Sets Cache-Control header with specified max-age
+- `etag/2`: Tests ETag functionality
+
+Each function or group of functions corresponds to different features or test scenarios for HTTP requests and responses.
 
 ## Usage
 
