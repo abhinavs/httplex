@@ -591,7 +591,7 @@ defmodule HTTPlexWeb.APIController do
         if check_digest_auth(creds, user, passwd, conn.method, conn.request_path, algorithm) do
           if stale_after && stale_after > 0 do
             conn
-            |> put_resp_header("authentication-info", "nextnonce=#{generate_nonce()}")
+            |> put_resp_header("authentication-info", "nextnonce=#{generate_random_string()}")
             |> json(%{authenticated: true, user: user})
           else
             json(conn, %{authenticated: true, user: user})
@@ -606,8 +606,8 @@ defmodule HTTPlexWeb.APIController do
   end
 
   defp send_digest_challenge(conn, qop, algorithm, stale) do
-    nonce = generate_nonce()
-    opaque = generate_opaque()
+    nonce = generate_random_string()
+    opaque = generate_random_string()
 
     conn
     |> put_resp_header(
@@ -655,11 +655,7 @@ defmodule HTTPlexWeb.APIController do
     |> Enum.into(%{})
   end
 
-  defp generate_nonce do
-    :crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)
-  end
-
-  defp generate_opaque do
+  defp generate_random_string do
     :crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)
   end
 
