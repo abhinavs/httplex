@@ -1,59 +1,91 @@
 <.flash_group flash={@flash} />
 
 <div id="swagger-ui" class="mt-8"></div>
+<style>
+  .swagger-ui,
+  .swagger-ui div,
+  .swagger-ui p,
+  .swagger-ui span:not(.opblock-summary-method):not(.parameter__type):not(.prop-type):not(.prop-format),
+  .swagger-ui label,
+  .swagger-ui button,
+  .swagger-ui input,
+  .swagger-ui select,
+  .swagger-ui textarea,
+  .swagger-ui .opblock-tag,
+  .swagger-ui .opblock .opblock-summary-operation-id,
+  .swagger-ui .opblock .opblock-summary-path,
+  .swagger-ui .opblock .opblock-summary-description,
+  .swagger-ui .opblock-description-wrapper p,
+  .swagger-ui .opblock-external-docs-wrapper p,
+  .swagger-ui .opblock-title_normal p,
+  .swagger-ui .info .title,
+  .swagger-ui .info .base-url,
+  .swagger-ui .info .title small,
+  .swagger-ui .info .title pre.version,
+  .swagger-ui .info p,
+  .swagger-ui .scheme-container .schemes>label,
+  .swagger-ui table thead tr th,
+  .swagger-ui table thead tr td,
+  .swagger-ui .parameter__name,
+  .swagger-ui .parameter__type,
+  .swagger-ui .response-col_status,
+  .swagger-ui .response-col_description,
+  .swagger-ui .tab li,
+  .swagger-ui .opblock-section-header h4,
+  .swagger-ui .opblock-section-header>label,
+  .swagger-ui section.models h4,
+  .swagger-ui section.models h5,
+  .swagger-ui .model-title,
+  .swagger-ui .prop-name,
+  .swagger-ui .prop-type {
+    font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  }
 
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-  <h2 class="text-2xl font-semibold mb-4">License</h2>
+  .swagger-ui .opblock-summary-method,
+  .swagger-ui code,
+  .swagger-ui pre,
+  .swagger-ui textarea.curl,
+  .swagger-ui .model-box,
+  .swagger-ui .prop-format,
+  .swagger-ui table.headers td,
+  .swagger-ui .parameter__in {
+    font-family: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  }
+</style>
 
-  <p class="mb-8">
-    The code is available as open source under the terms of the <a
-      href="https://opensource.org/licenses/MIT"
-      class="text-blue-600 hover:underline"
-    >MIT License</a>.
-  </p>
-
-  <h2 class="text-2xl font-semibold mb-4">Contributing</h2>
-
-  <p class="mb-8">
-    Bug reports and pull requests are welcome on GitHub at <a
-      href="https://github.com/abhinavs/httplex"
-      class="text-blue-600 hover:underline"
-    >https://github.com/abhinavs/httplex</a>.
-  </p>
-
-  <p class="text-lg">
-    ✨⚡You can read more about me on my
-    <a href="https://www.abhinav.co/about/" class="text-blue-600 hover:underline">blog</a>
-    or follow me on Twitter -
-    <a href="https://twitter.com/abhinav" class="text-blue-600 hover:underline">@abhinav</a>
-  </p>
+<div class="container mx-auto max-w-2xl">
+  <footer class="my-8 text-sm text-gray-800 font-mono bg-gray-50 rounded-large px-4 md:px-12 py-8 mx-auto">
+    <p class="mb-2">HTTPlex is an <a href="https://opensource.org/licenses/MIT"
+        class="text-blue-600 hover:underline">MIT licensed</a> project built with Elixir and Phoenix.</p>
+    <p class="mb-2">You can star or contribute to HTTPlex on <a href="https://github.com/abhinavs/httplex"
+        class="text-blue-600 hover:underline">GitHub</a>.</p>
+    <p>Created by <a href="https://twitter.com/abhinav" class="text-blue-600 hover:underline">@abhinav</a>. Check out
+      his
+      <a href="https://www.abhinav.co/" class="text-blue-600 hover:underline">website</a> for more projects.
+    </p>
+  </footer>
 </div>
 
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css"
-/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js">
 </script>
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js"
->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js">
 </script>
 <script>
   window.onload = function () {
-      const ui = SwaggerUIBundle({
-          url: "/httplex_openapi.json",
-          dom_id: "#swagger-ui",
-          presets: [
-              SwaggerUIBundle.presets.apis,
-              SwaggerUIStandalonePreset,
-          ],
-          // layout: "StandaloneLayout",
-          // tagsSorter: 'alpha',
-          docExpansion: 'none',
-          operationsSorter: 'alpha',
-          deepLinking: true
-      });
-      window.ui = ui;
+    const ui = SwaggerUIBundle({
+      url: "/httplex_openapi.json",
+      dom_id: "#swagger-ui",
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIStandalonePreset,
+      ],
+      docExpansion: 'none',
+      operationsSorter: 'alpha',
+      deepLinking: true,
+      // layout: "StandaloneLayout",
+      // tagsSorter: 'alpha',
+    });
+    window.ui = ui;
   };
 </script>

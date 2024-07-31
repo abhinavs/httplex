@@ -75,7 +75,7 @@
           "200": {
             "description": "Successful response",
             "content": {
-              "text/html": {
+              "application/json": {
                 "schema": {
                   "type": "string"
                 }
