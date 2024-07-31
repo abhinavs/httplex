@@ -80,8 +80,10 @@ defmodule HTTPlexWeb.Router do
     get "/stream/:n", APIController, :stream_json
     get "/uuid", APIController, :uuid
 
-    get "/cookies", APIController, :cookies
-    post "/cookies/set", APIController, :set_cookies
+    get "/cookies", APIController, :get_cookies
+    get "/cookies/delete", APIController, :delete_cookies
+    get "/cookies/set", APIController, :set_cookies
+    get "/cookies/set/:name/:value", APIController, :set_cookie
 
     get "/image/:format", APIController, :image
     get "/image", APIController, :image

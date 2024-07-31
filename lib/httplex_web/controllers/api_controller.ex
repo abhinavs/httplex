@@ -302,20 +302,37 @@ defmodule HTTPlexWeb.APIController do
     json(conn, %{uuid: uuid})
   end
 
-  @spec cookies(Plug.Conn.t(), any()) :: Plug.Conn.t()
-  def cookies(conn, _params) do
-    cookies = conn.req_cookies
-    json(conn, cookies)
+  @spec get_cookies(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def get_cookies(conn, _params) do
+    json(conn, conn.req_cookies)
+  end
+
+  @spec delete_cookies(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def delete_cookies(conn, params) do
+    conn = Enum.reduce(params, conn, fn {key, _}, acc ->
+      delete_resp_cookie(acc, key, max_age: 0)
+    end)
+
+    redirect(conn, to: "/cookies")
   end
 
   @spec set_cookies(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  def set_cookies(conn, %{"name" => name, "value" => value}) do
-    conn
-    |> put_resp_cookie(name, value)
-    |> json(%{message: "Cookie set!"})
+  def set_cookies(conn, params) do
+    conn = Enum.reduce(params, conn, fn {key, value}, acc ->
+      put_resp_cookie(acc, key, value)
+    end)
+
+    redirect(conn, to: "/cookies")
   end
 
-  @spec image(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec set_cookie(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def set_cookie(conn, %{"name" => name, "value" => value}) do
+    conn
+    |> put_resp_cookie(name, value)
+    |> redirect(to: "/cookies")
+  end
+
+  @spec image(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def image(conn, %{"format" => format}) do
     image_path =
       case format do

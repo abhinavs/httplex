@@ -586,18 +586,53 @@
     },
     "/cookies": {
       "get": {
-        "summary": "Get Cookies",
+        "summary": "Get cookies",
         "description": "Returns cookie data.",
         "tags": [
           "Cookies"
         ],
         "responses": {
           "200": {
-            "description": "Cookie data",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cookies/delete": {
+      "get": {
+        "summary": "Delete cookies",
+        "description": "Deletes cookie(s) as provided by the query string and redirects to cookie list.",
+        "tags": [
+          "Cookies"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cookieName",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name of the cookie to delete. Can be repeated for multiple cookies.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to cookie list",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -607,18 +642,70 @@
     },
     "/cookies/set": {
       "get": {
-        "summary": "Set Cookies",
-        "description": "Sets one or more simple cookies.",
+        "summary": "Set cookies",
+        "description": "Sets cookie(s) as provided by the query string and redirects to cookie list.",
         "tags": [
           "Cookies"
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cookieName",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name and value of the cookie to set. Can be repeated for multiple cookies.",
+            "required": false
+          }
+        ],
         "responses": {
-          "200": {
-            "description": "Cookie confirmation",
-            "content": {
-              "application/json": {
+          "302": {
+            "description": "Redirect to cookie list",
+            "headers": {
+              "Location": {
                 "schema": {
-                  "type": "object"
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cookies/set/{name}/{value}": {
+      "get": {
+        "summary": "Set a cookie",
+        "description": "Sets a cookie and redirects to cookie list.",
+        "tags": [
+          "Cookies"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Name of the cookie to set"
+          },
+          {
+            "in": "path",
+            "name": "value",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Value of the cookie to set"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to cookie list",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -956,9 +1043,103 @@
         }
       }
     },
+    "/absolute-redirect/{n}": {
+      "get": {
+        "summary": "Absolute redirect",
+        "description": "Absolutely 302 Redirects n times.",
+        "tags": [
+          "Redirects"
+        ],
+        "parameters": [
+          {
+            "name": "n",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Number of times to redirect"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/redirect-to": {
+      "get": {
+        "summary": "Redirect to URL",
+        "description": "302/3XX Redirects to the given URL.",
+        "tags": [
+          "Redirects"
+        ],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "The URL to redirect to"
+          },
+          {
+            "name": "status_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                301,
+                302,
+                303,
+                307,
+                308
+              ]
+            },
+            "description": "The HTTP status code for the redirect"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "$ref": "#/paths/~1redirect-to/get"
+      },
+      "put": {
+        "$ref": "#/paths/~1redirect-to/get"
+      },
+      "patch": {
+        "$ref": "#/paths/~1redirect-to/get"
+      },
+      "delete": {
+        "$ref": "#/paths/~1redirect-to/get"
+      }
+    },
     "/redirect/{n}": {
       "get": {
-        "summary": "Redirect n times",
+        "summary": "Relative redirect",
         "description": "302 Redirects n times.",
         "tags": [
           "Redirects"
@@ -969,13 +1150,48 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Number of times to redirect"
           }
         ],
         "responses": {
           "302": {
-            "description": "A redirection.",
+            "description": "Redirect",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relative-redirect/{n}": {
+      "get": {
+        "summary": "Relative redirect",
+        "description": "Relatively 302 Redirects n times.",
+        "tags": [
+          "Redirects"
+        ],
+        "parameters": [
+          {
+            "name": "n",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Number of times to redirect"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect",
             "headers": {
               "Location": {
                 "schema": {
@@ -1608,25 +1824,25 @@
         "$ref": "#/paths/~1anything/get",
         "tags": [
           "Anything"
-        ],
+        ]
       },
       "put": {
         "$ref": "#/paths/~1anything/get",
         "tags": [
           "Anything"
-        ],
+        ]
       },
       "patch": {
         "$ref": "#/paths/~1anything/get",
         "tags": [
           "Anything"
-        ],
+        ]
       },
       "delete": {
         "$ref": "#/paths/~1anything/get",
         "tags": [
           "Anything"
-        ],
+        ]
       }
     },
     "/anything/{anything}": {
@@ -1657,34 +1873,25 @@
         "$ref": "#/paths/~1anything~1{anything}/get",
         "tags": [
           "Anything"
-        ],
+        ]
       },
       "put": {
         "$ref": "#/paths/~1anything~1{anything}/get",
         "tags": [
           "Anything"
-        ],
+        ]
       },
       "patch": {
         "$ref": "#/paths/~1anything~1{anything}/get",
         "tags": [
           "Anything"
-        ],
+        ]
       },
       "delete": {
         "$ref": "#/paths/~1anything~1{anything}/get",
         "tags": [
           "Anything"
-        ],
-      }
-    }
-  },
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+        ]
       }
     }
   }

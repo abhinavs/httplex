@@ -284,14 +284,26 @@ defmodule HTTPlexWeb.APIControllerTest do
 
   describe "Cookies" do
     test "GET /cookies", %{conn: conn} do
-      conn = conn |> put_req_header("cookie", "test=value") |> get(~p"/cookies")
+      conn = conn |> put_req_cookie("test", "value") |> get("/cookies")
       assert json_response(conn, 200) == %{"test" => "value"}
     end
 
-    test "POST /cookies/set", %{conn: conn} do
-      conn = post(conn, ~p"/cookies/set", %{name: "test", value: "cookie_value"})
-      assert json_response(conn, 200) == %{"message" => "Cookie set!"}
-      assert conn.resp_cookies["test"] == %{value: "cookie_value"}
+    test "GET /cookies/delete deletes cookies and redirects", %{conn: conn} do
+      conn = conn |> put_req_cookie("test", "value") |> get("/cookies/delete?test")
+      assert redirected_to(conn, 302) == "/cookies"
+      assert %{max_age: 0} = conn.resp_cookies["test"]
+    end
+
+    test "GET /cookies/set sets cookies and redirects", %{conn: conn} do
+      conn = get(conn, "/cookies/set?key=value")
+      assert redirected_to(conn, 302) == "/cookies"
+      assert conn.resp_cookies["key"] == %{value: "value"}
+    end
+
+    test "GET /cookies/set/{name}/{value} sets a cookie and redirects", %{conn: conn} do
+      conn = get(conn, "/cookies/set/name/value")
+      assert redirected_to(conn, 302) == "/cookies"
+      assert conn.resp_cookies["name"] == %{value: "value"}
     end
   end
 
@@ -338,6 +350,11 @@ defmodule HTTPlexWeb.APIControllerTest do
   end
 
   describe "Redirect routes" do
+    test "GET /absolute-redirect/:n", %{conn: conn} do
+      conn = get(conn, ~p"/absolute-redirect/3")
+      assert redirected_to(conn, 302) =~ "/absolute-redirect/2"
+    end
+
     test "GET /redirect/:n redirects for n > 0", %{conn: conn} do
       conn = get(conn, ~p"/redirect/3")
       assert redirected_to(conn, 302) == "/redirect/2"
@@ -346,11 +363,6 @@ defmodule HTTPlexWeb.APIControllerTest do
     test "GET /redirect/:n stops redirecting when n = 0", %{conn: conn} do
       conn = get(conn, ~p"/redirect/0")
       assert json_response(conn, 200) == %{"message" => "Redirect completed"}
-    end
-
-    test "GET /absolute-redirect/:n", %{conn: conn} do
-      conn = get(conn, ~p"/absolute-redirect/3")
-      assert redirected_to(conn, 302) =~ "/absolute-redirect/2"
     end
 
     test "GET /relative-redirect/:n", %{conn: conn} do
