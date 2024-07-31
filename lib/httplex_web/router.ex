@@ -111,5 +111,4 @@ defmodule HTTPlexWeb.Router do
     match :*, "/anything", APIController, :anything
     match :*, "/anything/*anything", APIController, :anything
   end
-
 end

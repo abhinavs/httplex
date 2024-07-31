@@ -57,7 +57,7 @@ defmodule HTTPlex.MixProject do
       {:bandit, "~> 1.2"},
       {:cors_plug, "~> 3.0"},
       {:brotli, "~> 0.3.0"},
-       {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"}
     ]
   end
 

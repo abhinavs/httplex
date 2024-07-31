@@ -92,6 +92,7 @@ defmodule HTTPlexWeb.APIController do
     end
   end
 
+  @spec response_headers(any(), any()) :: Plug.Conn.t()
   def response_headers(conn, params) do
     conn =
       Enum.reduce(params, conn, fn {key, value}, acc ->
@@ -168,6 +169,7 @@ defmodule HTTPlexWeb.APIController do
     handle_digest_auth(conn, qop, user, passwd, "MD5", nil)
   end
 
+  @spec hidden_basic_auth(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def hidden_basic_auth(conn, %{"user" => user, "passwd" => passwd}) do
     case get_req_header(conn, "authorization") do
       ["Basic " <> encoded] ->
@@ -198,7 +200,7 @@ defmodule HTTPlexWeb.APIController do
 
   @spec delay(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delay(conn, %{"delay" => delay}) do
-  {delay, _} = Float.parse(delay)
+    {delay, _} = Float.parse(delay)
     delay = min(delay, 10.0)
     :timer.sleep(round(delay * 1000))
     json(conn, %{delay: delay})
@@ -207,8 +209,8 @@ defmodule HTTPlexWeb.APIController do
   @spec decode_base64(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def decode_base64(conn, %{"value" => value}) do
     case Base.url_decode64(value) do
-    {:ok, decoded} -> text(conn, decoded)
-    :error -> send_resp(conn, 400, "Invalid base64 encoding")
+      {:ok, decoded} -> text(conn, decoded)
+      :error -> send_resp(conn, 400, "Invalid base64 encoding")
     end
   end
 
@@ -223,6 +225,7 @@ defmodule HTTPlexWeb.APIController do
     |> send_resp(200, data)
   end
 
+  @spec drip(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def drip(conn, params) do
     duration = Map.get(params, "duration", "2") |> parse_float_or_int()
     numbytes = Map.get(params, "numbytes", "10") |> String.to_integer()
@@ -231,41 +234,54 @@ defmodule HTTPlexWeb.APIController do
     :timer.sleep(round(delay * 1000))
 
     interval = round(duration * 1000 / numbytes)
-    data = for _ <- 1..numbytes do
-      :timer.sleep(interval)
-      <<0>>
-    end
+
+    data =
+      for _ <- 1..numbytes do
+        :timer.sleep(interval)
+        <<0>>
+      end
 
     conn
     |> put_resp_content_type("application/octet-stream")
     |> send_resp(200, IO.iodata_to_binary(data))
   end
 
+  @spec links(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def links(conn, %{"n" => n, "offset" => offset}) do
     {n, _} = Integer.parse(n)
     {offset, _} = Integer.parse(offset)
-    links = Enum.map(1..n, fn i ->
-      "/links/#{n}/#{offset + i}"
-    end)
-    html = Enum.map(links, fn link ->
-      "<a href=\"#{link}\">#{link}</a><br>"
-    end) |> Enum.join("\n")
+
+    links =
+      Enum.map(1..n, fn i ->
+        "/links/#{n}/#{offset + i}"
+      end)
+
+    html =
+      Enum.map(links, fn link ->
+        "<a href=\"#{link}\">#{link}</a><br>"
+      end)
+      |> Enum.join("\n")
+
     html(conn, "<html><body>#{html}</body></html>")
   end
 
+  @spec range(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def range(conn, %{"numbytes" => numbytes}) do
     {numbytes, _} = Integer.parse(numbytes)
     data = :crypto.strong_rand_bytes(numbytes)
+
     conn
     |> put_resp_header("accept-ranges", "bytes")
-    |> put_resp_header("content-range", "bytes 0-#{numbytes-1}/#{numbytes}")
+    |> put_resp_header("content-range", "bytes 0-#{numbytes - 1}/#{numbytes}")
     |> put_resp_content_type("application/octet-stream")
     |> send_resp(200, data)
   end
 
+  @spec stream_bytes(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def stream_bytes(conn, %{"n" => n}) do
     {n, _} = Integer.parse(n)
     data = :crypto.strong_rand_bytes(n)
+
     conn
     |> put_resp_content_type("application/octet-stream")
     |> send_resp(200, data)
@@ -296,7 +312,7 @@ defmodule HTTPlexWeb.APIController do
     stream_data(conn, n - 1)
   end
 
-
+  @spec uuid(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def uuid(conn, _params) do
     uuid = UUID.uuid4()
     json(conn, %{uuid: uuid})
@@ -309,18 +325,20 @@ defmodule HTTPlexWeb.APIController do
 
   @spec delete_cookies(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete_cookies(conn, params) do
-    conn = Enum.reduce(params, conn, fn {key, _}, acc ->
-      delete_resp_cookie(acc, key, max_age: 0)
-    end)
+    conn =
+      Enum.reduce(params, conn, fn {key, _}, acc ->
+        delete_resp_cookie(acc, key, max_age: 0)
+      end)
 
     redirect(conn, to: "/cookies")
   end
 
   @spec set_cookies(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def set_cookies(conn, params) do
-    conn = Enum.reduce(params, conn, fn {key, value}, acc ->
-      put_resp_cookie(acc, key, value)
-    end)
+    conn =
+      Enum.reduce(params, conn, fn {key, value}, acc ->
+        put_resp_cookie(acc, key, value)
+      end)
 
     redirect(conn, to: "/cookies")
   end
@@ -349,20 +367,24 @@ defmodule HTTPlexWeb.APIController do
     |> send_file(200, image_path)
   end
 
+  @spec image(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def image(conn, _params) do
     conn
     |> put_resp_content_type("image/png")
     |> send_file(200, "priv/static/images/sample.png")
   end
 
+  @spec brotli(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def brotli(conn, _params) do
     {:ok, encoded_data} = :brotli.encode("This content is Brotli-encoded.")
+
     conn
     |> put_resp_content_type("text/plain")
     |> put_resp_header("content-encoding", "br")
     |> send_resp(200, encoded_data)
   end
 
+  @spec deflate(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def deflate(conn, _params) do
     conn
     |> put_resp_content_type("text/plain")
@@ -370,18 +392,21 @@ defmodule HTTPlexWeb.APIController do
     |> send_resp(200, :zlib.compress("This content is Deflate-encoded."))
   end
 
+  @spec deny(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def deny(conn, _params) do
     conn
     |> put_resp_content_type("text/plain")
     |> send_resp(200, "You've been denied access by robots.txt.")
   end
 
+  @spec encoding_utf8(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def encoding_utf8(conn, _params) do
     conn
     |> put_resp_content_type("text/plain", "utf-8")
     |> send_resp(200, "नमस्ते दुनिया")
   end
 
+  @spec gzip(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def gzip(conn, _params) do
     conn
     |> put_resp_content_type("text/plain")
@@ -389,6 +414,7 @@ defmodule HTTPlexWeb.APIController do
     |> send_resp(200, :zlib.gzip("This content is GZip-encoded."))
   end
 
+  @spec html_response(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def html_response(conn, _params) do
     conn
     |> put_resp_content_type("text/html")
@@ -400,6 +426,7 @@ defmodule HTTPlexWeb.APIController do
     json(conn, %{message: "This is a JSON response"})
   end
 
+  @spec robots_txt(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def robots_txt(conn, _params) do
     content = """
     # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
@@ -408,6 +435,7 @@ defmodule HTTPlexWeb.APIController do
     # User-agent: *
     # Disallow: /
     """
+
     conn
     |> put_resp_content_type("text/plain")
     |> send_resp(200, String.trim(content))
@@ -428,9 +456,10 @@ defmodule HTTPlexWeb.APIController do
     json(conn, conn.body_params)
   end
 
-   @spec absolute_redirect(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  @spec absolute_redirect(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def absolute_redirect(conn, %{"n" => n}) do
     n = String.to_integer(n)
+
     if n > 0 do
       redirect(conn, external: "#{custom_current_url(conn)}/absolute-redirect/#{n - 1}")
     else
@@ -441,6 +470,7 @@ defmodule HTTPlexWeb.APIController do
   @spec redirect_to(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def redirect_to(conn, %{"url" => url} = params) do
     status = Map.get(params, "status_code", "302") |> String.to_integer()
+
     conn
     |> put_status(status)
     |> redirect(external: url)
@@ -449,6 +479,7 @@ defmodule HTTPlexWeb.APIController do
   @spec redirectx(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def redirectx(conn, %{"n" => n}) do
     n = String.to_integer(n)
+
     if n > 0 do
       redirect(conn, to: "/redirect/#{n - 1}")
     else
@@ -459,6 +490,7 @@ defmodule HTTPlexWeb.APIController do
   @spec relative_redirect(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def relative_redirect(conn, %{"n" => n}) do
     n = String.to_integer(n)
+
     if n > 0 do
       redirect(conn, to: "/relative-redirect/#{n - 1}")
     else
@@ -466,21 +498,25 @@ defmodule HTTPlexWeb.APIController do
     end
   end
 
+  @spec anything(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def anything(conn, params) do
     {:ok, body, conn} = Plug.Conn.read_body(conn)
 
     content_type = get_req_header(conn, "content-type") |> List.first()
 
-    {data, json_data, form_data} = case content_type do
-      "application/json" <> _ ->
-        json_data = if body != "", do: Jason.decode!(body), else: %{}
-        {body, json_data, %{}}
-      "application/x-www-form-urlencoded" <> _ ->
-        form_data = if body != "", do: Plug.Conn.Query.decode(body), else: %{}
-        {body, nil, form_data}
-      _ ->
-        {body, nil, %{}}
-    end
+    {data, json_data, form_data} =
+      case content_type do
+        "application/json" <> _ ->
+          json_data = if body != "", do: Jason.decode!(body), else: %{}
+          {body, json_data, %{}}
+
+        "application/x-www-form-urlencoded" <> _ ->
+          form_data = if body != "", do: Plug.Conn.Query.decode(body), else: %{}
+          {body, nil, form_data}
+
+        _ ->
+          {body, nil, %{}}
+      end
 
     # Ensure query_params are fetched
     conn = fetch_query_params(conn)
@@ -639,7 +675,6 @@ defmodule HTTPlexWeb.APIController do
       :error -> String.to_integer(value)
     end
   end
+
   defp parse_float_or_int(value) when is_number(value), do: value
-
-
 end
