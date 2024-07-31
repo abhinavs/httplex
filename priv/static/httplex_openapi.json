@@ -1125,16 +1125,28 @@
         }
       },
       "post": {
-        "$ref": "#/paths/~1redirect-to/get"
+        "$ref": "#/paths/~1redirect-to/get",
+        "tags": [
+          "Redirects"
+        ]
       },
       "put": {
-        "$ref": "#/paths/~1redirect-to/get"
+        "$ref": "#/paths/~1redirect-to/get",
+        "tags": [
+          "Redirects"
+        ]
       },
       "patch": {
-        "$ref": "#/paths/~1redirect-to/get"
+        "$ref": "#/paths/~1redirect-to/get",
+        "tags": [
+          "Redirects"
+        ]
       },
       "delete": {
-        "$ref": "#/paths/~1redirect-to/get"
+        "$ref": "#/paths/~1redirect-to/get",
+        "tags": [
+          "Redirects"
+        ]
       }
     },
     "/redirect/{n}": {
@@ -1777,41 +1789,35 @@
     "/anything": {
       "get": {
         "summary": "Anything",
-        "description": "Returns anything passed in request data.",
+        "description": "Returns request data",
         "tags": [
           "Anything"
         ],
         "responses": {
           "200": {
-            "description": "Anything passed in request data",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "method": {
+                    "args": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "headers": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "origin": {
                       "type": "string"
                     },
                     "url": {
                       "type": "string"
-                    },
-                    "headers": {
-                      "type": "object"
-                    },
-                    "args": {
-                      "type": "object"
-                    },
-                    "data": {
-                      "type": "string"
-                    },
-                    "form": {
-                      "type": "object"
-                    },
-                    "json": {
-                      "type": "object"
-                    },
-                    "params": {
-                      "type": "object"
                     }
                   }
                 }
@@ -1819,30 +1825,6 @@
             }
           }
         }
-      },
-      "post": {
-        "$ref": "#/paths/~1anything/get",
-        "tags": [
-          "Anything"
-        ]
-      },
-      "put": {
-        "$ref": "#/paths/~1anything/get",
-        "tags": [
-          "Anything"
-        ]
-      },
-      "patch": {
-        "$ref": "#/paths/~1anything/get",
-        "tags": [
-          "Anything"
-        ]
-      },
-      "delete": {
-        "$ref": "#/paths/~1anything/get",
-        "tags": [
-          "Anything"
-        ]
       }
     },
     "/anything/{anything}": {
