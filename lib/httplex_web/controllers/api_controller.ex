@@ -3,53 +3,53 @@ defmodule HTTPlexWeb.APIController do
 
   @realm "abhinav@httplex.com"
 
-  @spec index(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec index(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def index(conn, _params) do
     json(conn, %{message: "Welcome to HTTPlex!"})
   end
 
-  @spec ip(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec ip(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def ip(conn, _params) do
     json(conn, %{origin: format_ip(conn.remote_ip)})
   end
 
-  @spec user_agent(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec user_agent(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def user_agent(conn, _params) do
     user_agent = get_req_header(conn, "user-agent") |> List.first()
     json(conn, %{"user-agent": user_agent})
   end
 
-  @spec headers(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec headers(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def headers(conn, _params) do
     json(conn, %{headers: Map.new(conn.req_headers)})
   end
 
-  @spec get(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec get(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def get(conn, _params) do
     json(conn, request_info(conn))
   end
 
-  @spec post(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec post(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def post(conn, _params) do
     json(conn, request_info(conn))
   end
 
-  @spec put(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec put(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def put(conn, _params) do
     json(conn, request_info(conn))
   end
 
-  @spec patch(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec patch(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def patch(conn, _params) do
     json(conn, request_info(conn))
   end
 
-  @spec delete(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec delete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete(conn, _params) do
     json(conn, request_info(conn))
   end
 
-  @spec cache(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec cache(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def cache(conn, _params) do
     etag = "33a64df551425fcc55e4d42a148795d9f25f89d4"
     last_modified = "Wed, 31 July 2024 07:28:00 GMT"
@@ -92,7 +92,7 @@ defmodule HTTPlexWeb.APIController do
     end
   end
 
-  @spec response_headers(any(), any()) :: Plug.Conn.t()
+  @spec response_headers(map(), any()) :: Plug.Conn.t()
   def response_headers(conn, params) do
     conn =
       Enum.reduce(params, conn, fn {key, value}, acc ->
@@ -125,7 +125,7 @@ defmodule HTTPlexWeb.APIController do
     end
   end
 
-  @spec bearer(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec bearer(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def bearer(conn, _params) do
     case get_req_header(conn, "authorization") do
       ["Bearer " <> token] ->
@@ -421,7 +421,7 @@ defmodule HTTPlexWeb.APIController do
     |> send_resp(200, "<html><body><h1>Hello, World!</h1></body></html>")
   end
 
-  @spec json_response(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec json_response(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def json_response(conn, _params) do
     json(conn, %{message: "This is a JSON response"})
   end
@@ -441,7 +441,7 @@ defmodule HTTPlexWeb.APIController do
     |> send_resp(200, String.trim(content))
   end
 
-  @spec xml(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec xml(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def xml(conn, _params) do
     conn
     |> put_resp_content_type("application/xml")
@@ -451,7 +451,7 @@ defmodule HTTPlexWeb.APIController do
     )
   end
 
-  @spec forms_post(Plug.Conn.t(), any()) :: Plug.Conn.t()
+  @spec forms_post(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def forms_post(conn, _params) do
     json(conn, conn.body_params)
   end
