@@ -126,3 +126,5 @@ If you like HTTPlex, do check out my other projects
 - [cookie](https://github.com/abhinavs/cookie) - an open source landing website with supporting pages and integrated blog
 
 ✨⚡You can read more about me on my [blog](https://www.abhinav.co/about/) or follow me on Twitter - [@abhinav](https://x.com/abhinav)
+
+Updated: 1 Jan 2025
