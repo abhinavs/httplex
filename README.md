@@ -127,4 +127,4 @@ If you like HTTPlex, do check out my other projects
 
 ✨⚡You can read more about me on my [blog](https://www.abhinav.co/about/) or follow me on Twitter - [@abhinav](https://x.com/abhinav)
 
-Updated: 3 June 2025
+Updated: 8 Feb 2026
